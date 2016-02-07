@@ -3,6 +3,13 @@
 
 #include <armadillo>
 
-double mdist(vec a, vec b);
+/** Return the manhattan distance from A to B
+ *  @param x1 A.x
+ *  @param y1 A.y
+ *  @param x2 B.x
+ *  @param y2 B.y
+ *  @return the distance
+ */
+double mdist(int x1, int y1, int x2, int y2);
 
 #endif
