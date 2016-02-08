@@ -4,10 +4,10 @@
 #include <vector>
 #include <armadillo>
 
-class AStar {
+class ForwardAStar {
   public:
-    AStar(arma::mat map, arma::ivec start, arma::ivec goal);
-    ~AStar(void);
+    ForwardAStar(arma::mat map, arma::ivec start, arma::ivec goal);
+    ~ForwardAStar(void);
     void compute(void);
     void decision_space(std::vector<arma::ivec> &path, std::vector<arma::ivec> &edges);
     void final_decision(std::vector<arma::ivec> &path, std::vector<arma::ivec> &edges);
