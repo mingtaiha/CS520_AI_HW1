@@ -1,5 +1,5 @@
-#ifndef heap_h
-#define heap_h
+#ifndef pqueue_h
+#define pqueue_h
 
 #include <vector>
 #include <iostream>
@@ -9,16 +9,16 @@ class qcell {
     double cost;
     int x;
     int y;
-    int parent_id; // to be used statically
-    qcell(int x, int y, double cost, int parent_id);
+    int parent_x; 
+	int parent_y;
+    qcell(int x, int y, double cost, int parent_x, int parent_y);
+    std::ostream &operator<<(std::ostream &out);
     bool operator<(const qcell &other);
     bool operator>(const qcell &other);
     bool operator<=(const qcell &other);
     bool operator>=(const qcell &other);
     bool operator==(const qcell &other);
 };
-
-std::ostream &operator<<(std::ostream &out, qcell &cell);
 
 class heap {
   public:
@@ -29,12 +29,12 @@ class heap {
     void insert(qcell item);
     qcell remove(void);
     void print(void);
+    void swap(int a, int b);
+	bool isEmpty();
 
-    std::vector<qcell> queue;
+	std::vector<qcell> queue;
     int n_elem;
 
-  private:
-    void swap(int a, int b);
 };
 
 #endif
