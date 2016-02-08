@@ -1,4 +1,4 @@
-#include "pqueue.h"
+#include "heap.h"
 #include <iostream>
 #include <vector>
 
@@ -16,8 +16,8 @@ qcell::qcell(int x, int y, double cost, int parent_id) {
   this->parent_id = parent_id;
 }
 
-ostream &qcell::operator<<(ostream &out) {
-  out << "[x:" << this->x << ", " << this->y << "] = " << this->cost << endl;
+ostream &operator<<(ostream &out, qcell &cell) {
+  out << "[x:" << cell.x << ", " << cell.y << "] = " << cell.cost << endl;
 }
 
 bool qcell::operator<(const qcell &other) {
@@ -32,7 +32,7 @@ bool qcell::operator<=(const qcell &other) {
   return this->cost <= other.cost;
 }
 
-bool qcell::operator>=(const cqell &other) {
+bool qcell::operator>=(const qcell &other) {
   return this->cost >= other.cost;
 }
 
@@ -103,7 +103,7 @@ void heap::insert(qcell item) {
 
 qcell heap::remove(void) {
   if (this->n_elem == 0) {
-    return { 0, 0, 0 };
+    return qcell(0, 0, 0, -1);
   } else {
     qcell c = this->queue[0];
     this->swap(0, --this->n_elem);
