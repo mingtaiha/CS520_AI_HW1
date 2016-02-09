@@ -30,11 +30,10 @@ class heap {
     qcell remove(void);
     void print(void);
     void swap(int a, int b);
-	bool isEmpty();
+    bool isEmpty();
 
-	std::vector<qcell> queue;
+    std::vector<qcell> queue;
     int n_elem;
-
 };
 
 #endif

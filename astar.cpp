@@ -9,7 +9,7 @@ using namespace arma;
  *  @param start This is the starting position of the robot
  *  @param goal This is the goal of the robot
  */
-ForwardAStar::ForwardAStar(mat &map, ivec start, ivec goal) {
+ForwardAStar::ForwardAStar(imat map, ivec &start, ivec &goal) {
   // TODO: YOUR CODE GOES HERE
 }
 

@@ -14,7 +14,7 @@ using namespace std;
 // start states and goal state. If no such path exists, then return
 // false
 
-bool isValidMap(mat map, int x1, int y1, int x2, int y2) {
+bool isValidMap(imat map, int x1, int y1, int x2, int y2) {
   assert(0 <= x1 && x1 < (int)map.n_cols); 				// Check if x1 is within the maze
   assert(0 <= y1 && y1 < (int)map.n_rows);				// Check if y1 is within the maze
   assert(0 <= x2 && x2 < (int)map.n_cols);				// Check if x2 is within the maze
@@ -55,11 +55,11 @@ bool isValidMap(mat map, int x1, int y1, int x2, int y2) {
 #if TEST_bfscheck_cpp
 
 int main() {
-  mat map1 = reshape(mat({
+  imat map1 = reshape(imat({
       0, 1, 0,
       0, 0, 0,
       0, 1, 0 }), 3, 3).t();
-  mat map2 = reshape(mat({
+  imat map2 = reshape(imat({
       0, 1, 0,
       0, 1, 0,
       0, 1, 0 }), 3, 3).t();

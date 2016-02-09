@@ -11,6 +11,6 @@
  *  @param y2 the y coord of point B
  *  @return true if a path can be found, false otherwise
  */
-bool isValidMap(arma::mat map, int x1, int y1, int x2, int y2);
+bool isValidMap(arma::imat map, int x1, int y1, int x2, int y2);
 
 #endif
