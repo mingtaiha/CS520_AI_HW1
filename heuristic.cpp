@@ -1,6 +1,10 @@
 #include "heuristic.h"
-#include <cmath>
 
-double mdist(int x1, int y1, int x2, int y2) {
-  return abs(x2 - x1) + abs(y2 - y1);
+#define ABS(x) (((x) < 0) ? -(x) : (x))
+
+int mdist(int x1, int y1, int x2, int y2) {
+  // TODO: fill in the manhattan distance here
+  printf("[heuristic.cpp] Remember to fill in the manhattan distance\n"); // remove this line
+  exit(1); // remove this line
+  return 0;
 }

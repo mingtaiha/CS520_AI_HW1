@@ -11,6 +11,7 @@ class ForwardAStar {
     void compute(void);
     void decision_space(std::vector<arma::ivec> &path, std::vector<arma::ivec> &edges);
     void final_decision(std::vector<arma::ivec> &path, std::vector<arma::ivec> &edges);
+    bool complete(void);
 
     arma::ivec start;
     arma::ivec goal;
