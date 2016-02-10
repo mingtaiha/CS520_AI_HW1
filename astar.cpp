@@ -2,6 +2,7 @@
 #include <armadillo>
 
 using namespace arma;
+using namespace std;
 
 /** The goal of this function is to initialize the AStar algorithm,
  *  including any data structures which you are to use in the
