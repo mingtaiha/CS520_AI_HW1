@@ -26,6 +26,8 @@ class state {
 
 		state(ivec loc, state * parent);
 		~state();
+		void setG(ivec start);
+		void setH(ivec goal);
 		bool operator<(const state &other);
 		bool operator>(const state &other);
 		bool operator<=(const state &other);
@@ -38,11 +40,21 @@ class state {
 ostream &operator<<(ostream &out, state &cur_state);
 
 
-class heaptree {
+class heap {
 
 	public:
 
-		
+		heap();
+		~heap();
+		void swap(int a, int b);
+		void siftup();
+		void siftdown();
+		void insert(state * item);
+		state * remove();
+		bool isEmpty();
+
+		int n_elem;
+		vector<state *> queue;
 };
 
 
@@ -57,11 +69,11 @@ class searchtree {
 		void setG(ivec start);
 		void setH(ivec goal);
 
-
+		
 		mat map;
 		ivec start;
 		ivec end;
-		state root
+		state root;
 
 };
 
