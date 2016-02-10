@@ -24,10 +24,10 @@ class state {
 		double h_value;					// Estimated cost of getting to the goal
 										//		from the current state
 
-		state(ivec loc, state * parent);
+		state(int x, int y, state * parent);
 		~state();
-		void setG(ivec start);
-		void setH(ivec goal);
+		void setG(int start_x, int start_y);
+		void setH(int goal_x, int goal_y);
 		bool operator<(const state &other);
 		bool operator>(const state &other);
 		bool operator<=(const state &other);
@@ -63,18 +63,20 @@ class searchtree {
 
 	public:
 
-		searchtree(ivec start, ivec goal, mat map);
+		searchtree(int start_x, int start_y, int goal_x, int goal_y, mat map);
 		~searchtree();
-		void traverse(state * node);
-		void addChild(state * child);
+		void addChildren(state * child);
+		void addToTree(state * node);
 
 		mat map;
-		mat visited;
-		ivec start;
-		ivec end;
+		imat visited;
+		imat queued;
+		int start_x;
+		int start_y;
+		int goal_x;
+		int goal_y;
 		state * root;
-		state * cur;
-
+		heap pqueue;
 
 };
 

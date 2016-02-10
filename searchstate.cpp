@@ -9,14 +9,14 @@
 #define lchild(index)  (((index)*2)+1)
 #define rchild(index)  (((index)*2)+2)
 
-#define TESTING 0 
+#define TESTING 1 
 
 using namespace std;
 
 
-state::state(ivec loc, state * parent) {
-	x = loc(0);
-	y = loc(1);
+state::state(int x, int y, state * parent) {
+	this->x = x;
+	this->y = y;
 	g_value = -1;
 	h_value = -1;
 	this->parent = parent;
@@ -25,12 +25,12 @@ state::state(ivec loc, state * parent) {
 state::~state() {
 }
 
-void state::setG(ivec start) {
-	g_value = mdist(this->x, this->y, start(0), start(1));
+void state::setG(int start_x, int start_y) {
+	g_value = mdist(this->x, this->y, start_x, start_y);
 }
 
-void state::setH(ivec goal) {
-	h_value = mdist(this->x, this->y, goal(0), goal(1));
+void state::setH(int goal_x, int goal_y) {
+	h_value = mdist(this->x, this->y, goal_x, goal_y);
 }
 
 bool state::operator<(const state &other) {
@@ -142,29 +142,42 @@ bool heap::isEmpty() {
 /// ------------ SEARCHTREE -------------- /// 
 
 
-searchtree::searchtree(ivec start, ivec goal, mat map) {
+searchtree::searchtree(int start_x, int start_y, int goal_x, int goal_y, mat map) {
 	this->map = map;
-	this->visited = zeros<mat>(size(map));
-	this->start = start;
-	this->end = end;
-	this->root = &state(start, NULL);
-	this->cur = this->root;
-
+	this->start_x = start_x;
+	this->start_y = start_y;
+	this->goal_x = goal_x;
+	this->goal_y = goal_y;
+	visited = zeros<imat>(size(map, 1), size(map, 1));
+	queued = zeros<imat>(size(map, 1), size(map, 1));
+	*root = state(start_x, start_y, NULL);
+	pqueue = heap();
 }
 	
 searchtree::~searchtree(){
 }
 
-void traverse(state * node) {
-	this->cur = node;
+void addChildren(state * cur, heap pqueue, imat visited, imat queued) {
+	
+	state * temp;
+	int x_s = cur->x;
+	int y_s = cur->y;
+	
+	ivec x_t = {x_s - 1, x_s, x_s + 1, x_s};
+	ivec y_t = {y_s, y_s + 1, y_s, y_s - 1};
+
+	for(int i = 0; i < 4; i++) {
+		if (visited(x_t(i), y_t(i)) == 0) {
+			pqueue.insert(new state(x_t(i), y_t(i), cur));
+			queued(x_t(i), y_t(i)) = 1;
+		} else {
+		}
+	}
 }
 
-void addChild(state * child) {
-	child->parent = this->cur;
-	this->cur->children.push_back(child);
-	this->visited(child->x, child->y) = 1;
+void addToTree(state * node) {
+	node->parent->children.push_back(node);
 }
-
 
 /// ------------ TESTING -------------- ///
 
@@ -174,58 +187,6 @@ void addChild(state * child) {
 
 int main() {
 
-	arma::ivec st(2);
-	arma::ivec gl(2);
-	arma::ivec a(2);
-	arma::ivec b(2);
-	arma::ivec c(2);
-	arma::ivec d(2);
-	arma::ivec e(2);
-	arma::ivec f(2);
-
-	st = {10, 0};
-	gl = {20, 10};
-	a = {0, 0};
-	b = {10, 10};
-	c = {30, 40};
-	d = {10, 15};
-	e = {15, 25};
-	f = {25, 15};
-	
-
-	state test_a(a, NULL);
-	state test_b(b, &test_a);
-	state test_c(c, &test_b);
-	state test_d(d, &test_c);
-	state test_e(e, &test_d);
-	state test_f(f, &test_e);
-
-	test_a.setG(st);
-	test_b.setG(st);
-	test_c.setG(st);
-	test_d.setG(st);
-	test_e.setG(st);
-	test_f.setG(st);
-	test_a.setH(gl);
-	test_b.setH(gl);
-	test_c.setH(gl);
-	test_d.setH(gl);
-	test_e.setH(gl);
-	test_f.setH(gl);
-
-	cout << test_a << test_b << test_c << test_d << test_e << test_f;
-
-	heap h;
-	h.insert(&test_a);
-	h.insert(&test_b);
-	h.insert(&test_c);
-	h.insert(&test_d);
-	h.insert(&test_e);
-	h.insert(&test_f);
-
-	cout << *(h.queue[0]) << *(h.queue[1]) << *(h.queue[2]) << *(h.queue[3]) << *(h.queue[4]) << *(h.queue[5]); 
-	cout << endl << *(h.remove()); //<< *(h.remove());
-	
 	return 0;
 
 }
