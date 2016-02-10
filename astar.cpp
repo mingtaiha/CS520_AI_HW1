@@ -9,7 +9,7 @@ using namespace arma;
  *  @param start This is the starting position of the robot
  *  @param goal This is the goal of the robot
  */
-ForwardAStar::ForwardAStar(mat &map, ivec start, ivec goal) {
+ForwardAStar::ForwardAStar(imat map, ivec &start, ivec &goal) {
   // TODO: YOUR CODE GOES HERE
 }
 
@@ -27,7 +27,7 @@ void ForwardAStar::compute(void) {
   // STEP 2: Use random tie breaking to choose a position from the queue,
   //         and place the rest back into the queue
   // STEP 3: Detect if the current node is the goal node;
-  //         if it is, RETURN a list of nodes from the search space
+  //         if it is, RETURN (do not do anything)
   // STEP 4: Compute the cost of the 4-connected neighborhood and
   //         add them to the priority queue if they have not been
   //         added before
@@ -50,5 +50,12 @@ void ForwardAStar::decision_space(vector<ivec> &path, vector<ivec> &edges) {
  *         each edgeindex is an index of path
  */
 void ForwardAStar::final_decision(vector<ivec> &path, vector<ivec> &edges) {
+  // TODO: YOUR CODE GOES HERE
+}
+
+/** Return whether or not the goal has been reached
+ *  @return true if goal is reached, false otherwise
+ */
+bool ForwardAStar::complete(void) {
   // TODO: YOUR CODE GOES HERE
 }

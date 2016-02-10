@@ -1,6 +1,6 @@
 CFLAGS = -std=c++11
 LIBS = -larmadilllo -lSDL2
-OBJS = heuristic.o maze_gen.o mapcheck.o heap.o sim_window.o sim.o
+OBJS = heuristic.o maze_gen.o mapcheck.o pqueue.o sim_window.o draw.o sim.o
 
 all: $(OBJS)
 
@@ -8,4 +8,4 @@ all: $(OBJS)
 	g++ $(CFLAGS) -o $@ -c $<
 
 clean:
-	rm -f *.o sim
+	rm -f *.o sim maze_gen
