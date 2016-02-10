@@ -65,15 +65,16 @@ class searchtree {
 
 		searchtree(ivec start, ivec goal, mat map);
 		~searchtree();
-		void addChild(state child);
-		void setG(ivec start);
-		void setH(ivec goal);
+		void traverse(state * node);
+		void addChild(state * child);
 
-		
 		mat map;
+		mat visited;
 		ivec start;
 		ivec end;
-		state root;
+		state * root;
+		state * cur;
+
 
 };
 

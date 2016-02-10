@@ -142,10 +142,28 @@ bool heap::isEmpty() {
 /// ------------ SEARCHTREE -------------- /// 
 
 
+searchtree::searchtree(ivec start, ivec goal, mat map) {
+	this->map = map;
+	this->visited = zeros<mat>(size(map));
+	this->start = start;
+	this->end = end;
+	this->root = &state(start, NULL);
+	this->cur = this->root;
 
+}
+	
+searchtree::~searchtree(){
+}
 
+void traverse(state * node) {
+	this->cur = node;
+}
 
-
+void addChild(state * child) {
+	child->parent = this->cur;
+	this->cur->children.push_back(child);
+	this->visited(child->x, child->y) = 1;
+}
 
 
 /// ------------ TESTING -------------- ///
