@@ -1,8 +1,11 @@
 CFLAGS = -std=c++11
-LIBS = -larmadilllo -lSDL2
+LIBS = -larmadillo -lSDL2
 OBJS = heuristic.o maze_gen.o mapcheck.o pqueue.o sim_window.o draw.o sim.o
 
-all: $(OBJS)
+all: $(OBJS) sim
+
+sim: $(OBJS)
+	g++ $(CFLAGS) -o $@ $^ $(LIBS)
 
 %.o: %.cpp
 	g++ $(CFLAGS) -o $@ -c $<

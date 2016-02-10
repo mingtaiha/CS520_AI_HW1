@@ -5,7 +5,7 @@
 using namespace arma;
 using namespace std;
 
-#define TEST_bfscheck_cpp 1
+#define TEST_bfscheck_cpp 0
 
 // use bfs to validate the map (to check if there is a path from the
 // start state (x1, y1) to the goal state (x2, y2)

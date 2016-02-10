@@ -6,7 +6,7 @@
 
 #define SIZE 10
 #define BLOCK_PROB 30
-#define TESTING 1
+#define TESTING 0
 //Note:: The blocking probability is 100 times the actually probability
 
 using namespace std;
