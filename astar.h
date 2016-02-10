@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <armadillo>
-#include "pqueue.h"
+#include "searchstate.h"
 
 class ForwardAStar {
   public:
@@ -19,7 +19,7 @@ class ForwardAStar {
     arma::ivec goal;
 
     // stuff for the decision making capability
-    heap priority_queue;
+    searchtree tree;
 };
 
 #endif

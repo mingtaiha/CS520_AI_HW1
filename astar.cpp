@@ -1,4 +1,5 @@
 #include "astar.h"
+#include <armadillo>
 
 using namespace arma;
 
