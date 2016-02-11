@@ -8,6 +8,7 @@
 #include "pqueue.h"
 #include "maze_gen.h"
 #include "mapcheck.h"
+#include "searchstate.h"
 
 using namespace std;
 using namespace arma;

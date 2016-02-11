@@ -9,7 +9,7 @@
 #define lchild(index)  (((index)*2)+1)
 #define rchild(index)  (((index)*2)+2)
 
-#define TESTING 1 
+#define TESTING 0 
 
 using namespace std;
 
@@ -53,6 +53,10 @@ bool state::operator==(const state &other) {
 	return (this->g_value + this->h_value) == (other.g_value + other.h_value);
 }
 
+bool state::operator!=(const state &other) {
+	return (this->g_value + this->h_value) != (other.g_value + other.h_value);
+}
+
 ostream &operator<<(ostream &out, state &st) {
 	out << "[x y] = [" << st.x << " " << st.y << "]\t\t [g h] = [" << st.g_value << " " << st.h_value << "]\n";
 
@@ -62,20 +66,20 @@ ostream &operator<<(ostream &out, state &st) {
 /// ------------ HEAP -------------- ///
 
 
-heap::heap() {
+heap_n::heap_n() {
 	this->n_elem = 0;
 }
 
-heap::~heap() {
+heap_n::~heap_n() {
 }
 
-void heap::swap(int a, int b) {
+void heap_n::swap(int a, int b) {
 	state * temp = this->queue[a];
 	this->queue[a] = this->queue[b];
 	this->queue[b] = temp;
 }
 
-void heap::siftup() {
+void heap_n::siftup() {
 	assert(n_elem > 0);
 	int index = n_elem - 1;
 	while(index >= 0) {
@@ -88,7 +92,7 @@ void heap::siftup() {
 	}
 }
 
-void heap::siftdown() {
+void heap_n::siftdown() {
 	assert(n_elem > 0);
 	int index = this->n_elem - 1;
 	int ptr = 0;
@@ -112,14 +116,14 @@ void heap::siftdown() {
 	}
 }
 
-void heap::insert(state * item) {
+void heap_n::insert(state * item) {
 	this->queue.push_back(item);
 	this->n_elem++;
 	this->siftup();
 }
 
 
-state * heap::remove() {
+state * heap_n::remove() {
 	if(this->n_elem == 0) {
 		return NULL;
 	} else {
@@ -130,7 +134,7 @@ state * heap::remove() {
 	}
 }
 
-bool heap::isEmpty() {
+bool heap_n::isEmpty() {
 	if(this->n_elem == 0) {
 		return true;
 	} else {
@@ -142,7 +146,10 @@ bool heap::isEmpty() {
 /// ------------ SEARCHTREE -------------- /// 
 
 
-searchtree::searchtree(int start_x, int start_y, int goal_x, int goal_y, mat map) {
+searchtree::searchtree() {
+}
+
+searchtree::searchtree(int start_x, int start_y, int goal_x, int goal_y, imat map) {
 	this->map = map;
 	this->start_x = start_x;
 	this->start_y = start_y;
@@ -151,13 +158,14 @@ searchtree::searchtree(int start_x, int start_y, int goal_x, int goal_y, mat map
 	visited = zeros<imat>(size(map, 1), size(map, 1));
 	queued = zeros<imat>(size(map, 1), size(map, 1));
 	*root = state(start_x, start_y, NULL);
-	pqueue = heap();
+	pqueue = heap_n();
 }
 	
 searchtree::~searchtree(){
 }
 
-void addChildren(state * cur, heap pqueue, imat visited, imat queued) {
+void searchtree::addChildren(state * cur, heap_n pqueue, imat visited, imat queued, imat map,
+					int start_x, int start_y, int goal_x, int goal_y) {
 	
 	state * temp;
 	int x_s = cur->x;
@@ -167,16 +175,28 @@ void addChildren(state * cur, heap pqueue, imat visited, imat queued) {
 	ivec y_t = {y_s, y_s + 1, y_s, y_s - 1};
 
 	for(int i = 0; i < 4; i++) {
-		if (visited(x_t(i), y_t(i)) == 0) {
-			pqueue.insert(new state(x_t(i), y_t(i), cur));
+		if (x_t(i) < 0 || x_t(i) >= size(map, 1) || y_t(i) < 0 || y_t(i) >= size(map, 1)) {
+			continue;
+		}
+		temp = new state(x_t(i), y_t(i), cur);
+		temp->setG(start_x, start_y);
+		temp->setH(goal_x, goal_y);
+		cur->children.push_back(temp);
+		if ((visited(x_t(i), y_t(i)) == 0)) {
 			queued(x_t(i), y_t(i)) = 1;
+			if (map(x_t(i), y_t(i)) == 0) {
+				pqueue.insert(temp);
+
+			} else {
+			}
 		} else {
 		}
 	}
 }
 
-void addToTree(state * node) {
+void searchtree::addToTree(state * node, imat visited) {
 	node->parent->children.push_back(node);
+	visited(node->x, node->y) = 1;
 }
 
 /// ------------ TESTING -------------- ///

@@ -33,19 +33,19 @@ class state {
 		bool operator<=(const state &other);
 		bool operator>=(const state &other);
 		bool operator==(const state &other);
-
+		bool operator!=(const state &other);
 };
 
 
 ostream &operator<<(ostream &out, state &cur_state);
 
 
-class heap {
+class heap_n {
 
 	public:
 
-		heap();
-		~heap();
+		heap_n();
+		~heap_n();
 		void swap(int a, int b);
 		void siftup();
 		void siftdown();
@@ -62,13 +62,15 @@ class heap {
 class searchtree {
 
 	public:
-
-		searchtree(int start_x, int start_y, int goal_x, int goal_y, mat map);
+		
+		searchtree();
+		searchtree(int start_x, int start_y, int goal_x, int goal_y, imat map);
 		~searchtree();
-		void addChildren(state * child);
-		void addToTree(state * node);
+		void addChildren(state * cur, heap_n pqueue, imat visited, imat queued, imat map,
+							int start_x, int start_y, int goal_x, int goal_y);
+		void addToTree(state * node, imat visited);
 
-		mat map;
+		imat map;
 		imat visited;
 		imat queued;
 		int start_x;
@@ -76,7 +78,7 @@ class searchtree {
 		int goal_x;
 		int goal_y;
 		state * root;
-		heap pqueue;
+		heap_n pqueue;
 
 };
 
