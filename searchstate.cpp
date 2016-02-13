@@ -149,7 +149,11 @@ bool heap_n::isEmpty() {
 searchtree::searchtree() {
 }
 
-searchtree::searchtree(int start_x, int start_y, int goal_x, int goal_y, imat map) {
+searchtree::searchtree(int sx, int sy, int gx, int gy, imat map) {
+  init(sx, sy, gx, gy, map);
+}
+
+void searchtree::init(int start_x, int start_y, int goal_x, int goal_y, imat map) {
 	this->map = map;
 	this->start_x = start_x;
 	this->start_y = start_y;

@@ -21,11 +21,7 @@ using namespace std;
  */
 ForwardAStar::ForwardAStar(imat map, ivec &start, ivec &goal) {
 	isComplete = 0;
-	tree.map = map;
-	tree.start_x = start(0);
-	tree.start_y = start(1);
-	tree.goal_x = goal(0);
-	tree.goal_y = goal(1);
+	tree.init(start(0), start(1), goal(0), goal(1), map);
 	tree.queued(start(0), start(1)) = 1;
 	tree.visited(start(0), start(1)) = 1;
 	this->start = start;
@@ -42,20 +38,13 @@ ForwardAStar::~ForwardAStar(void) {
  *  into the search space
  */
 void ForwardAStar::compute(void) {
-  // TODO: YOUR CODE GOES HERE
-  // STEP 1: Grab a list of minimum positions from the priority queue
-  // STEP 2: Use random tie breaking to choose a position from the queue,
-  //         and place the rest back into the queue
-  // STEP 3: Detect if the current node is the goal node;
-  //         if it is, RETURN (do not do anything)
-  // STEP 4: Compute the cost of the 4-connected neighborhood and
-  //         add them to the priority queue if they have not been
-  //         added before
-  // STEP 5: set the added flag of the neighbors to true
-
 	state * choice;
 	vector<state *> breaktie;
 	
+  // STEP 1: Grab a list of minimum positions from the priority queue
+  if (isComplete) {
+    return;
+  }
 	breaktie.push_back(tree.pqueue.remove());
 	while (!tree.pqueue.isEmpty()) {
 		state *s = tree.pqueue.remove();
@@ -64,6 +53,8 @@ void ForwardAStar::compute(void) {
 			break;
 		}
 	}
+  // STEP 2: Use random tie breaking to choose a position from the queue,
+  //         and place the rest back into the queue
 	struct {
 		bool operator()(state *a, state *b) {
 			return a->g_value > b->g_value;
@@ -76,53 +67,15 @@ void ForwardAStar::compute(void) {
 	}
 	breaktie.clear(); // clear the vector for later usage
 
-
-/*	
-	if(tree.pqueue.isEmpty()) {
-		return breaktie[0];
-	}
-
-	breaktie.push_back(tree.pqueue.remove());
-
-	if (*(breaktie[0]) < *(breaktie[1])) {
-		isDifferent = 1;
-		reinsert = breaktie[1];
-		tree.pqueue.insert(reinsert);
-		breaktie.pop_back();
-	} else {
-		while(!(isDifferent || tree.pqueue.isEmpty())) {
-			breaktie.push_back(tree.pqueue.remove());
-			if (*(breaktie[0]) < *(breaktie[i])) {
-				isDifferent = 1;
-				reinsert = breaktie[i];
-				tree.pqueue.insert(reinsert);
-				breaktie.pop_back();
-			} else {
-				i++;
-			}
-		}
-		for (int j = 0; j <= i; j++) {
-			if (breaktie[i]->g_value < breaktie[index]->g_value) {
-				index = 1;
-			} else {
-			}
-		}
-
-		choice = breaktie[index];
-		state * temp = breaktie[0];
-		breaktie[0] = breaktie[index];
-		breaktie[index] = temp;
-
-		while (i > 0) {
-			reinsert = breaktie[i];
-			tree.pqueue.insert(reinsert);
-			breaktie.pop_back();
-			i--;
-		}
-*/
+  // STEP 3: Detect if the current node is the goal node;
+  //         if it is, RETURN (do not do anything)
 	if (choice->x == tree.start_x && choice->y == tree.start_y) {
 		isComplete = 1;
 	} else {
+  // STEP 4: Compute the cost of the 4-connected neighborhood and
+  //         add them to the priority queue if they have not been
+  //         added before
+  // STEP 5: set the added flag of the neighbors to true
 		tree.addChildren(choice, tree.pqueue, tree.visited, tree.queued, tree.map,
 						tree.start_x, tree.start_y, tree.goal_x, tree.goal_y);
 		tree.addToTree(choice, tree.visited);
@@ -169,7 +122,8 @@ state * ForwardAStar::AStar(state * root, searchtree tree) {
 
 void ForwardAStar::decision_space(vector<ivec> &path, vector<ivec> &edges) {
   // TODO: YOUR CODE GOES HERE
-  	
+  path.clear();
+  edges.clear();
 	int len = size(map, 1);
 
 	for (int i = 0; i < len; i++) {
@@ -193,7 +147,8 @@ void ForwardAStar::decision_space(vector<ivec> &path, vector<ivec> &edges) {
  */
 void ForwardAStar::final_decision(vector<ivec> &path, vector<ivec> &edges) {
   // TODO: YOUR CODE GOES HERE
-
+  path.clear();
+  edges.clear();
 	state * step = fin;
 
 	while(step != NULL) {

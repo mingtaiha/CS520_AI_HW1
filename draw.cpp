@@ -6,8 +6,8 @@
 using namespace arma;
 using namespace std;
 
-static int blocksize = 32;
-static int linethickness = 2;
+static int blocksize = 4;
+static int linethickness = 1;
 
 void setBlockSize(int bs) {
   blocksize = bs;
@@ -44,8 +44,8 @@ void blitRGB(SDL_Surface *screen, icube &image) {
 }
 
 void drawGrid(icube &grid, imat &map) {
-  int width = blocksize * (map.n_cols + linethickness) + linethickness * 3;
-  int height = blocksize * (map.n_rows + linethickness) + linethickness * 3;
+  int width = getGridWidth(map.n_cols);
+  int height = getGridHeight(map.n_rows);
   if (grid.n_rows != height || grid.n_cols != width) {
     grid = icube(height, width, 3, fill::zeros);
   } else {

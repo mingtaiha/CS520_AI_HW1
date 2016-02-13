@@ -65,6 +65,7 @@ class searchtree {
 		
 		searchtree();
 		searchtree(int start_x, int start_y, int goal_x, int goal_y, imat map);
+		void init(int start_x, int start_y, int goal_x, int goal_y, imat map);
 		~searchtree();
 		void addChildren(state * cur, heap_n pqueue, imat visited, imat queued, imat map,
 							int start_x, int start_y, int goal_x, int goal_y);
