@@ -1,4 +1,4 @@
-CFLAGS = -std=c++11
+CFLAGS = -std=c++11 -O3
 LIBS = -larmadillo -lSDL2
 OBJS = heuristic.o maze_gen.o mapcheck.o searchstate.o sim_window.o draw.o sim.o astar.o
 

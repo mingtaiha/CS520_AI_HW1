@@ -53,7 +53,6 @@ class heap_n {
 		state * remove();
 		bool isEmpty();
 
-		int n_elem;
 		vector<state *> queue;
 };
 
@@ -67,9 +66,9 @@ class searchtree {
 		searchtree(int start_x, int start_y, int goal_x, int goal_y, imat map);
 		void init(int start_x, int start_y, int goal_x, int goal_y, imat map);
 		~searchtree();
-		void addChildren(state * cur, heap_n pqueue, imat visited, imat queued, imat map,
+		void addChildren(state * cur, heap_n &pqueue, imat &visited, imat &queued, imat &map,
 							int start_x, int start_y, int goal_x, int goal_y);
-		void addToTree(state * node, imat visited);
+		void addToTree(state * node, imat &visited);
 
 		imat map;
 		imat visited;
