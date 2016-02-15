@@ -3,8 +3,9 @@
 #include "maze_gen.h"
 #include <algorithm>
 #include <iostream>
-#include <new>
 #include <vector>
+#include "svec.h"
+#include "state.h"
 #include <cassert>
 #include <armadillo>
 
@@ -41,7 +42,7 @@ ForwardAStar::~ForwardAStar(void) {
 void ForwardAStar::compute(void) {
 	assert(!tree.pqueue.isEmpty());
 	state * choice;
-	vector<state *> breaktie;
+	svec breaktie;
 
 	// STEP 1: Grab a list of minimum positions from the priority queue
 //	//printf("Step 1\n");

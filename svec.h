@@ -2,7 +2,7 @@
 #define svec_h
 
 #include <cstdlib>
-#include "searchstate.h"
+#include "state.h"
 
 class svec {
   public:

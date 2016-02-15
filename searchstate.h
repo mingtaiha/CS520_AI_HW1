@@ -3,7 +3,7 @@
 
 #include "heuristic.h"
 #include <iostream>
-#include <vector>
+#include "svec.h"
 #include <new>
 #include <armadillo>
 
@@ -19,7 +19,7 @@ class state {
 		int x;							// Current x-coordinates
 		int y;							// Current y-coordinates
 		state * parent;					// Pointer to the parent state
-		vector<state *> children;		// Vector of pointers to each child node
+		svec children;					// Vector of pointers to each child node
 		double g_value;					// Cost of getting to the current state
 		double h_value;					// Estimated cost of getting to the goal
 										//		from the current state
@@ -53,7 +53,7 @@ class heap_n {
 		state * remove();
 		bool isEmpty();
 
-		vector<state *> queue;
+		svec queue;
 };
 
 

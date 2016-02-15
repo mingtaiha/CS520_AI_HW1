@@ -1,7 +1,8 @@
 #include "searchstate.h"
 #include "heuristic.h"
 #include <iostream>
-#include <vector>
+#include "state.h"
+#include "svec.h"
 #include <cassert>
 #include <armadillo>
 
@@ -68,7 +69,6 @@ ostream &operator<<(ostream &out, state &st) {
 
 
 heap_n::heap_n() {
-	queue.reserve(65535);
 }
 
 heap_n::~heap_n() {

@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <armadillo>
+#include "svec.h"
+#include "state.h"
 #include "searchstate.h"
 
 class ForwardAStar {
