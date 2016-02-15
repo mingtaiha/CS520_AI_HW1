@@ -49,7 +49,6 @@ void ForwardAStar::compute(void) {
 		return;
 	}
 	state * s = tree.pqueue.remove();
-	int _ = s->x;
 	breaktie.push_back(s);
 //	breaktie.push_back(tree.pqueue.remove());
 	while (!tree.pqueue.isEmpty()) {
@@ -71,12 +70,12 @@ void ForwardAStar::compute(void) {
 //	//printf("Step 2\n");
 	struct {
 		bool operator()(state *a, state *b) {
-			return a->g_value < b->g_value;
+			return a->g_value > b->g_value;
 		}
 	} compareStates;
 	sort(breaktie.begin(), breaktie.end(), compareStates);
 //	for (state * s: breaktie) {
-//		//cout << * s << endl;
+//		cout << * s << endl;
 //	}
 	choice = breaktie[0];
 	for (int i = 1; i < breaktie.size(); i++) {
@@ -101,16 +100,19 @@ void ForwardAStar::compute(void) {
 		//         add them to the priority queue if they have not been
 		//         added before
 //		//printf("Step 4\n");
-		tree.addChildren(choice, tree.pqueue, tree.visited, tree.queued, tree.map,
-				tree.start_x, tree.start_y, tree.goal_x, tree.goal_y);
+		
+	
+			tree.addChildren(choice, tree.pqueue, tree.visited, tree.queued, tree.map,
+					tree.start_x, tree.start_y, tree.goal_x, tree.goal_y);
 //		//printf("Added Children\n");
 //		for(state *ss : tree.pqueue.queue) {
 //			//cout << *ss << endl;
 //		}
-		tree.addToTree(choice, tree.visited);
+			tree.addToTree(choice, tree.visited);
 //		//cout << "added to tree\n";
-		isComplete = 0;
-	}
+			isComplete = 0;
+		
+	}	
 }
 
 

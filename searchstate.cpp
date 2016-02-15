@@ -26,7 +26,8 @@ state::~state() {
 }
 
 void state::setG(int start_x, int start_y) {
-	g_value = mdist(this->x, this->y, start_x, start_y);
+	g_value = mdist(this->x, this->y, start_x, start_y);	
+//	g_value = 1 + ((this->parent == NULL) ? 0 : this->parent->g_value);
 }
 
 void state::setH(int goal_x, int goal_y) {
@@ -192,16 +193,25 @@ void searchtree::addChildren(state * cur, heap_n &pqueue, imat &visited, imat &q
 		if (x_t(i) < 0 || x_t(i) >= size(map, 1) || y_t(i) < 0 || y_t(i) >= size(map, 1)) {
 			continue;
 		}
+		if (map(x_t(i), y_t(i)) == 1) {
+			continue;
+		}
+		if (visited(x_t(i), y_t(i)) == 1) {
+			continue;
+		}
 		temp = new state(x_t(i), y_t(i), cur);
-//		//cout << "Child: " << *temp << endl;
-//		//cout << "Parent: " << *cur << endl;
-		temp->setG(cur->x, cur->y);
+		temp->setG(start_x, start_y);
 		temp->setH(goal_x, goal_y);
+//		cout << "Child: " << *temp << endl;
+//		cout << "Parent: " << *cur << endl;
 //		cur->children.push_back(temp);
 		if ((visited(x_t(i), y_t(i)) == 0)) {
-			queued(x_t(i), y_t(i)) = 1;
+//			queued(x_t(i), y_t(i)) = 1;
 			if (map(x_t(i), y_t(i)) == 0) {
+				cout << "Child: " << *temp << endl;
+				cout << "Parent: " << *cur << endl;
 				pqueue.insert(temp);
+				queued(x_t(i), y_t(i)) = 1;
 
 			} else {
 			}
@@ -212,6 +222,7 @@ void searchtree::addChildren(state * cur, heap_n &pqueue, imat &visited, imat &q
 
 void searchtree::addToTree(state * node, imat &visited) {
 	if (node->parent == NULL) {
+		visited(node->x , node->y) = 1;
 		return;			// Exception for root case
 	}
 	//printf("Parent %p\n", node->parent);

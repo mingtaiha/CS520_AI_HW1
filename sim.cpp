@@ -10,7 +10,9 @@
 #include "mapcheck.h"
 #include "searchstate.h"
 
-#define size 30
+#define size 100
+#define block_prob 20
+#define t_delay 25
 using namespace std;
 using namespace arma;
 
@@ -28,16 +30,27 @@ void run_map(imat map) {
   //printf("drawing grid\n");
   drawGrid(pathmap, map);
   //printf("finished\n");
+  int i_blip = 0;
   while (!astar.complete()) {
-    //printf("computing\n");
+	SDL_Event *e;
+	while ((e = sim_window::get_event())) {
+		if (e->type == SDL_QUIT) {
+			sim_window::destroy();
+			exit(1);
+		}
+	}
+	//printf("computing\n");
     astar.compute();
     //printf("getting decision space\n");
     astar.decision_space(path, edges);
     //printf("drawing path\n");
-    drawPath(pathmap, path, edges);
-    blitRGB(screen, pathmap);
-    sim_window::update();
-    SDL_Delay(25);
+	if (i_blip % 1 == 0) {
+    	drawPath(pathmap, path, edges);
+    	blitRGB(screen, pathmap);
+    	sim_window::update();
+		SDL_Delay(t_delay);
+		}
+		i_blip++;
   }
   // draw the final decision
   astar.final_decision(path, edges);
@@ -45,17 +58,18 @@ void run_map(imat map) {
   drawPath(pathmap, path, edges);
   blitRGB(screen, pathmap);
   sim_window::update();
-  SDL_Delay(25);
+  SDL_Delay(t_delay);
 }
 
 int main() {
   // create maps
   vector<imat> maps;
   //printf("creating maps\n");
+  srand(getpid());
   for (int i = 0; i < 50; i++) {
-    imat maze = maze_gen(size, 30);
+    imat maze = maze_gen(size, block_prob);
     while (!isValidMap(maze, 0, 0, size-1, size-1)) {
-      maze = maze_gen(size, 30);
+      maze = maze_gen(size, block_prob);
     }
     maps.push_back(maze);
   }
