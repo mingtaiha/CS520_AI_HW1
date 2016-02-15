@@ -1,5 +1,5 @@
 #include "astar.h"
-#include "searchstate.h"
+#include "searchtree.h"
 #include "maze_gen.h"
 #include <algorithm>
 #include <iostream>
@@ -21,13 +21,13 @@ using namespace std;
  *  @param goal This is the goal of the robot
  */
 ForwardAStar::ForwardAStar(imat map, ivec &start, ivec &goal) {
-	isComplete = 0;
-	tree.init(start(0), start(1), goal(0), goal(1), map);
-	tree.queued(start(0), start(1)) = 1;
-	tree.visited(start(0), start(1)) = 1;
-	this->start = start;
-	this->goal = goal;
-	this->map = map;
+  isComplete = 0;
+  tree.init(start(0), start(1), goal(0), goal(1), map);
+  tree.queued(start(1), start(0)) = 1;
+  tree.visited(start(1), start(0)) = 1;
+  this->start = start;
+  this->goal = goal;
+  this->map = map;
 }
 
 ForwardAStar::~ForwardAStar(void) {
@@ -39,112 +39,59 @@ ForwardAStar::~ForwardAStar(void) {
  *  into the search space
  */
 void ForwardAStar::compute(void) {
-	assert(!tree.pqueue.isEmpty());
-	state * choice;
-	vector<state *> breaktie;
+  assert(!tree.pqueue.isEmpty());
+  state * choice;
+  svec breaktie;
 
-	// STEP 1: Grab a list of minimum positions from the priority queue
-//	//printf("Step 1\n");
-	if (isComplete) {
-		return;
-	}
-	state * s = tree.pqueue.remove();
-	breaktie.push_back(s);
-//	breaktie.push_back(tree.pqueue.remove());
-	while (!tree.pqueue.isEmpty()) {
-		s = tree.pqueue.remove();
-//	state *s = tree.pqueue.remove();
-		//cout << *s << endl;
-		if ((*s) != (*breaktie[0])) {
-			tree.pqueue.insert(s);
-			break;
-		}
-	}
+  // STEP 1: Grab a list of minimum positions from the priority queue
+  if (isComplete) {
+    return;
+  }
+  state * s = tree.pqueue.remove();
+  breaktie.push_back(s);
+  while (!tree.pqueue.isEmpty()) {
+    s = tree.pqueue.remove();
+    if ((*s) != (*breaktie[0])) {
+      tree.pqueue.insert(s);
+      break;
+    }
+    breaktie.push_back(s);
+  }
 
-//	for (state * s: breaktie) {
-//		//cout << * s << endl;
-//	}
+  // STEP 2: Use random tie breaking to choose a position from the queue,
+  //         and place the rest back into the queue
+  struct {
+    int gx;
+    int gy;
+    bool operator()(state *a, state *b) {
+      return eucdist(a->x, a->y, gx, gy) < eucdist(b->x, b->y, gx, gy); // get the min value
+    }
+  } compareStates;
+  compareStates.gx = goal(0);
+  compareStates.gy = goal(1);
+  sort(breaktie.begin(), breaktie.end(), compareStates);
+  choice = breaktie[0];
+  for (int i = 1; i < breaktie.size(); i++) {
+    tree.pqueue.insert(breaktie[i]);
+  }
+  breaktie.clear(); // clear the vector for later usage
 
-	// STEP 2: Use random tie breaking to choose a position from the queue,
-	//         and place the rest back into the queue
-//	//printf("Step 2\n");
-	struct {
-		bool operator()(state *a, state *b) {
-			return a->g_value > b->g_value;
-		}
-	} compareStates;
-	sort(breaktie.begin(), breaktie.end(), compareStates);
-//	for (state * s: breaktie) {
-//		cout << * s << endl;
-//	}
-	choice = breaktie[0];
-	for (int i = 1; i < breaktie.size(); i++) {
-		tree.pqueue.insert(breaktie[i]);
-	}
-	breaktie.clear(); // clear the vector for later usage
+  // STEP 3: Detect if the current node is the goal node;
+  //         if it is, RETURN (do not do anything)
 
-	// STEP 3: Detect if the current node is the goal node;
-	//         if it is, RETURN (do not do anything)
-//	//printf("Step 3\n");
-	
-	//cout << "choice->x" << choice->x << endl;
-	//cout << "tree.goal_x" << tree.goal_x << endl;
-	//cout << "choice->y" << choice->y << endl;
-	//cout << "tree.goal_y" << tree.goal_y << endl;
-
-	if (choice->x == tree.goal_x && choice->y == tree.goal_y) {
-		isComplete = 1;
-//		//printf("Already Completed\n");
-	} else {
-		// STEP 4: Compute the cost of the 4-connected neighborhood and
-		//         add them to the priority queue if they have not been
-		//         added before
-//		//printf("Step 4\n");
-		
-	
-			tree.addChildren(choice, tree.pqueue, tree.visited, tree.queued, tree.map,
-					tree.start_x, tree.start_y, tree.goal_x, tree.goal_y);
-//		//printf("Added Children\n");
-//		for(state *ss : tree.pqueue.queue) {
-//			//cout << *ss << endl;
-//		}
-			tree.addToTree(choice, tree.visited);
-//		//cout << "added to tree\n";
-			isComplete = 0;
-		
-	}	
+  if (choice->x == tree.goal_x && choice->y == tree.goal_y) {
+    isComplete = 1;
+    fin = choice;
+  } else {
+    // STEP 4: Compute the cost of the 4-connected neighborhood and
+    //         add them to the priority queue if they have not been
+    //         added before
+    tree.addToTree(choice, tree.visited);
+    tree.addChildren(choice, tree.pqueue, tree.visited, tree.queued, tree.map,
+        tree.start_x, tree.start_y, tree.goal_x, tree.goal_y);
+    isComplete = 0;
+  }	
 }
-
-
-
-/*
-   state * ForwardAStar::AStar(state * root, searchtree tree) {
-
-   if (tree.start_x == tree.goal_x && tree.start_y == tree.goal_y) {					// Checking if the start and goal are the same
-   return tree.root;															// If so, just return the root
-   }
-   else {
-   tree.addToTree(root, tree.visited);
-   tree.addChildren(root, tree.pqueue, tree.visited, tree.queued, tree.map,	// If not, then add the children of the heap. This function
-   tree.start_x, tree.start_y, tree.goal_x, tree.goal_y);  //      (should) check if the neighbors are in the map
-   }
-
-   state * ptr =  root;															// Initializing a pointer for the tree growth to the root node
-   while (!((ptr->x == tree.goal_x) && (ptr->y == tree.goal_y))) {					// While loop is valid when the (x,y) of the ptr and the goal
-//		is NOT the same
-if (tree.pqueue.isEmpty()) {												// Checks if the heap is empty
-//cout << "No path from start to goal...\n" << endl;
-return new state(-1, -1, NULL);											// Returns a default null state
-}
-ptr = compute(tree);														// Otherwise, a new pointer to a state will be returned after
-//		computing the path once and advancing one state
-}
-return ptr;																		// Return the goal state, which is connect via parents to
-// 		the start state
-}
- */
-
-
 
 /** Grab the entire tree of nodes and edges from the search space
  *  @param path a vector of (x, y) tuples
@@ -153,22 +100,21 @@ return ptr;																		// Return the goal state, which is connect via pare
  */
 
 void ForwardAStar::decision_space(vector<ivec> &path, vector<ivec> &edges) {
-	// TODO: YOUR CODE GOES HERE
-	path.clear();
-	edges.clear();
-	int len = size(map, 1);
+  path.clear();
+  edges.clear();
+  int len = size(map, 1);
 
-	for (int i = 0; i < len; i++) {
-		for (int j = 0; j < len; j++) {
-			if (tree.queued(i, j) == 1) {
-				if (tree.visited(i, j) == 1) {
-					path.push_back({i, j});
-				} else {
-					edges.push_back({i, j});
-				}
-			}
-		}
-	}
+  for (int i = 0; i < len; i++) {
+    for (int j = 0; j < len; j++) {
+      if (tree.queued(i, j) == 1) {
+        if (tree.visited(i, j) == 1) {
+          path.push_back({j, i});
+        } else {
+          edges.push_back({j, i});
+        }
+      }
+    }
+  }
 }
 
 /** Grab the final path of nodes and edges from the search space
@@ -178,20 +124,18 @@ void ForwardAStar::decision_space(vector<ivec> &path, vector<ivec> &edges) {
  *         each edgeindex is an index of path
  */
 void ForwardAStar::final_decision(vector<ivec> &path, vector<ivec> &edges) {
-	// TODO: YOUR CODE GOES HERE
-	path.clear();
-	edges.clear();
-	state * step = fin;
+  path.clear();
+  edges.clear();
+  state * step = fin;
+  int i = 0;
+  path.push_back({step->x, step->y});
+  step = step->parent;
 
-	while(step != NULL) {
-		path.push_back({step->x, step->y});
-
-		int nchild = step->children.size();
-		for (int i = 0; i < nchild; i++) {
-			edges.push_back({step->children[i]->x, step->children[i]->y});
-		}
-		step = step->parent;
-	}	
+  while(step != NULL) {
+    edges.push_back({i, i + 1});
+    path.push_back({step->x, step->y});
+    step = step->parent;
+  }	
 }
 
 
@@ -199,8 +143,7 @@ void ForwardAStar::final_decision(vector<ivec> &path, vector<ivec> &edges) {
  *  @return true if goal is reached, false otherwise
  */
 bool ForwardAStar::complete(void) {
-	// TODO: YOUR CODE GOES HERE
-	return isComplete;
+  return isComplete;
 }
 
 
@@ -208,7 +151,7 @@ bool ForwardAStar::complete(void) {
 
 int main() {
 
-	return 0;
+  return 0;
 
 }
 

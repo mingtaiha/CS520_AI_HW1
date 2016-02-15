@@ -2,6 +2,7 @@
 #include "sim_window.h"
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 using namespace arma;
 using namespace std;
@@ -70,8 +71,6 @@ void drawGrid(icube &grid, imat &map) {
 
 void drawPath(icube &grid, vector<ivec> &path, vector<ivec> &edges) {
   // start drawing the path
-  icube greensquare = zeros<icube>(blocksize, blocksize, 3);
-  greensquare.slice(1) = ones<imat>(blocksize, blocksize) * 255;
   icube redsquare = zeros<icube>(blocksize, blocksize, 3);
   redsquare.slice(0) = ones<imat>(blocksize, blocksize) * 255;
   for (ivec &node : path) {
@@ -83,5 +82,21 @@ void drawPath(icube &grid, vector<ivec> &path, vector<ivec> &edges) {
     int endcol = linethickness + (x + 1) * (blocksize + linethickness);
     grid(span(startrow, endrow-1), span(startcol, endcol-1), span::all) = redsquare;
   }
-  // TODO: draw edges (do not need to do so for now)
+  /*for (ivec &edge : edges){
+    int idx1 = edge(0);
+    int idx2 = edge(1);
+    ivec pt1 = path[idx1];
+    ivec pt2 = path[idx2];
+    int cx1 = linethickness * 2 + pt1(0) * (blocksize + linethickness) + blocksize / 2;
+    int cy1 = linethickness * 2 + pt1(1) * (blocksize + linethickness) + blocksize / 2;
+    int cx2 = linethickness * 2 + pt2(0) * (blocksize + linethickness) + blocksize / 2;
+    int cy2 = linethickness * 2 + pt2(1) * (blocksize + linethickness) + blocksize / 2;
+    int x1 = MIN(cx1, cx2);
+    int x2 = MAX(cx1, cx2);
+    int y1 = MIN(cy1, cy2);
+    int y2 = MAX(cy1, cy2);
+    grid(span(y1, x1), span(y2, x2), span(0, 0)) = 0;
+    grid(span(y1, x1), span(y2, x2), span(1, 1)) = 255;
+    grid(span(y1, x1), span(y2, x2), span(2, 2)) = 0;
+  }*/
 }

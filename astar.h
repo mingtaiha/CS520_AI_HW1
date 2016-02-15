@@ -1,9 +1,9 @@
-	#ifndef astar_h
+#ifndef astar_h
 #define astar_h
 
 #include <vector>
 #include <armadillo>
-#include "searchstate.h"
+#include "searchtree.h"
 
 class ForwardAStar {
   public:

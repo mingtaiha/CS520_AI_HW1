@@ -3,11 +3,9 @@
 #include <ctime>
 #include <armadillo>
 #include <cstring>
+#include "maze_gen.h"
 
-#define SIZE 100
-#define BLOCK_PROB 0
 #define TESTING 0
-//Note:: The blocking probability is 100 times the actually probability
 
 using namespace std;
 using namespace arma;
@@ -20,7 +18,7 @@ imat maze_gen(int size, int block_prob) {
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
 
-			rand_val = rand() % SIZE  + 1;
+			rand_val = rand() % 100 + 1; // changed this to reflect up to 100% probability
 
 			if (rand_val <= block_prob) {
 				maze(i , j) = 1;

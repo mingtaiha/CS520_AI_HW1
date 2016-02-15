@@ -11,5 +11,6 @@
  *  @return the distance
  */
 int mdist(int x1, int y1, int x2, int y2);
+int eucdist(int x1, int y1, int x2, int y2);
 
 #endif
