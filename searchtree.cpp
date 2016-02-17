@@ -86,11 +86,11 @@ bool heap_n::isEmpty() {
 searchtree::searchtree() {
 }
 
-searchtree::searchtree(int sx, int sy, int gx, int gy, imat &map) {
-  init(sx, sy, gx, gy, map);
+searchtree::searchtree(int sx, int sy, int gx, int gy, imat &map, int hmode) {
+  init(sx, sy, gx, gy, map, hmode);
 }
 
-void searchtree::init(int start_x, int start_y, int goal_x, int goal_y, imat &map) {
+void searchtree::init(int start_x, int start_y, int goal_x, int goal_y, imat &map, int hmode) {
   this->map = map;
   this->start_x = start_x;
   this->start_y = start_y;
@@ -100,17 +100,22 @@ void searchtree::init(int start_x, int start_y, int goal_x, int goal_y, imat &ma
   queued = zeros<imat>(map.n_rows, map.n_cols);
   // initially set root to NULL
   root = NULL;
-  state * temp = new state(start_x, start_y, NULL, map);
+  state * temp = new state(start_x, start_y, NULL, map, hmode);
   temp->setG(start_x, start_y);
-  temp->setH(goal_x, goal_y);
+  temp->setH(goal_x, goal_y, start_x, start_y);
   pqueue.insert(temp);
 }
 
 searchtree::~searchtree() {
+  for (state * s : pqueue.queue) {
+    delete s;
+  }
+  root->clear();
+  delete root;
 }
 
 void searchtree::addChildren(state * cur, heap_n &pqueue, imat &visited, imat &queued, imat &map,
-    int start_x, int start_y, int goal_x, int goal_y) {
+    int start_x, int start_y, int goal_x, int goal_y, int hmode) {
 
   state * temp;
   int x_s = cur->x;
@@ -134,9 +139,9 @@ void searchtree::addChildren(state * cur, heap_n &pqueue, imat &visited, imat &q
       continue;
     }
     // create a new node with cur as the parent
-    temp = new state(x_t(i), y_t(i), cur, map);
+    temp = new state(x_t(i), y_t(i), cur, map, hmode);
     temp->setG(start_x, start_y);
-    temp->setH(goal_x, goal_y);
+    temp->setH(goal_x, goal_y, start_x, start_y);
     // add to queue
     pqueue.insert(temp);
     queued(y_t(i), x_t(i)) = 1;
@@ -164,146 +169,7 @@ void searchtree::addToTree(state * node, imat &visited) {
 
 
 int main() {
-
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  heap_n pqueue;
-  arma::imat m;
-  state *t;
-  t = new state(0, 0, NULL, m);
-  t->g_value = 6;
-  t->h_value = 0;
-  pqueue.insert(t);
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  t = new state(0, 0, NULL, m);
-  t->g_value = 5;
-  t->h_value = 0;
-  pqueue.insert(t);
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  t = new state(0, 0, NULL, m);
-  t->g_value = 3;
-  t->h_value = 0;
-  pqueue.insert(t);
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  t = new state(0, 0, NULL, m);
-  t->g_value = 1;
-  t->h_value = 0;
-  pqueue.insert(t);
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  t = new state(0, 0, NULL, m);
-  t->g_value = 8;
-  t->h_value = 0;
-  pqueue.insert(t);
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  t = new state(0, 0, NULL, m);
-  t->g_value = 7;
-  t->h_value = 0;
-  pqueue.insert(t);
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  t = new state(0, 0, NULL, m);
-  t->g_value = 2;
-  t->h_value = 0;
-  pqueue.insert(t);
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  t = new state(0, 0, NULL, m);
-  t->g_value = 4;
-  t->h_value = 0;
-  pqueue.insert(t);
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-
-
-  /// SIFT DOWN ///
-  state *s;
-  s = pqueue.remove();
-  cout << "removed: " << s->g_value << endl;
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  s = pqueue.remove();
-  cout << "removed: " << s->g_value << endl;
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  s = pqueue.remove();
-  cout << "removed: " << s->g_value << endl;
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  s = pqueue.remove();
-  cout << "removed: " << s->g_value << endl;
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  s = pqueue.remove();
-  cout << "removed: " << s->g_value << endl;
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  s = pqueue.remove();
-  cout << "removed: " << s->g_value << endl;
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  s = pqueue.remove();
-  cout << "removed: " << s->g_value << endl;
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-  s = pqueue.remove();
-  cout << "removed: " << s->g_value << endl;
-  for (int i = 0; i < pqueue.queue.size(); i++) {
-    state *s = pqueue.queue[i];
-    cout << s->g_value << endl;
-  }
-  cout << "~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-
   return 0;
-
 }
 
 #endif

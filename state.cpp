@@ -5,7 +5,7 @@
 using namespace std;
 using namespace arma;
 
-state::state(int x, int y, state * parent, imat &map) {
+state::state(int x, int y, state * parent, imat &map, int heuristic_mode) {
 	this->x = x;
 	this->y = y;
 	g_value = -1;
@@ -14,6 +14,7 @@ state::state(int x, int y, state * parent, imat &map) {
 	this->parent = parent;
   this->map = map;
   memset(&this->children, 0, sizeof(state *) * 4); // reset the children
+  hmode = heuristic_mode;
 }
 
 state::~state() {
@@ -24,8 +25,13 @@ void state::setG(int start_x, int start_y) {
   f = g_value + h_value;
 }
 
-void state::setH(int goal_x, int goal_y) {
-	h_value = mdist(this->x, this->y, goal_x, goal_y);
+void state::setH(int goal_x, int goal_y, int start_x, int start_y) {
+  if (hmode == H_REPEATED) {
+  	h_value = mdist(this->x, this->y, goal_x, goal_y);
+  } else {
+    h_value = mdist(start_x, start_y, goal_x, goal_y) -
+      ((this->parent == NULL) ? 0 : this->parent->g_value + 1);
+  }
   f = g_value + h_value;
 }
 
@@ -51,6 +57,15 @@ bool state::operator==(const state &other) {
 
 bool state::operator!=(const state &other) {
 	return this->f != other.f;
+}
+
+void state::clear(void) {
+  for (int i = 0; i < 4; i++) {
+    if (this->children[i]) {
+      this->children[i]->clear();
+      delete this->children[i];
+    }
+  }
 }
 
 ostream &operator<<(ostream &out, state &st) {

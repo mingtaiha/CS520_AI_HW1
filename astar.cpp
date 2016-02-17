@@ -3,7 +3,6 @@
 #include "maze_gen.h"
 #include <algorithm>
 #include <iostream>
-#include <new>
 #include <vector>
 #include <cassert>
 #include <armadillo>
@@ -20,17 +19,23 @@ using namespace std;
  *  @param start This is the starting position of the robot
  *  @param goal This is the goal of the robot
  */
-ForwardAStar::ForwardAStar(imat map, ivec &start, ivec &goal) {
+AStar::AStar(imat map, ivec &start, ivec &goal, int forward_mode, int heuristic_mode) {
   isComplete = 0;
-  tree.init(start(0), start(1), goal(0), goal(1), map);
+  tree.init(start(0), start(1), goal(0), goal(1), map, heuristic_mode);
   tree.queued(start(1), start(0)) = 1;
-  tree.visited(start(1), start(0)) = 1;
-  this->start = start;
-  this->goal = goal;
+  tree.visited(start(1), start(0)) = 0;
+  if (forward_mode) {
+    this->start = start;
+    this->goal = goal;
+  } else {
+    this->start = goal;
+    this->goal = start;
+  }
   this->map = map;
+  this->heuristic_mode = heuristic_mode;
 }
 
-ForwardAStar::~ForwardAStar(void) {
+AStar::~AStar(void) {
 }
 
 /** In this function, you are to get the next state off the
@@ -38,7 +43,7 @@ ForwardAStar::~ForwardAStar(void) {
  *  computing the cost and placing the state that was traversed
  *  into the search space
  */
-void ForwardAStar::compute(void) {
+void AStar::compute(void) {
   assert(!tree.pqueue.isEmpty());
   state * choice;
   svec breaktie;
@@ -64,7 +69,7 @@ void ForwardAStar::compute(void) {
     int gx;
     int gy;
     bool operator()(state *a, state *b) {
-      return eucdist(a->x, a->y, gx, gy) < eucdist(b->x, b->y, gx, gy); // get the min value
+      return a->g_value < b->g_value; // get the min value
     }
   } compareStates;
   compareStates.gx = goal(0);
@@ -88,71 +93,63 @@ void ForwardAStar::compute(void) {
     //         added before
     tree.addToTree(choice, tree.visited);
     tree.addChildren(choice, tree.pqueue, tree.visited, tree.queued, tree.map,
-        tree.start_x, tree.start_y, tree.goal_x, tree.goal_y);
+        tree.start_x, tree.start_y, tree.goal_x, tree.goal_y, heuristic_mode);
     isComplete = 0;
   }	
 }
 
-/** Grab the entire tree of nodes and edges from the search space
+/** Grab the entire tree of nodes from the search space
  *  @param path a vector of (x, y) tuples
- *  @param edges a vector of (edgeindex1, edgeindex2) tuples, where
- *         each edgeindex is an index of path
  */
 
-void ForwardAStar::decision_space(vector<ivec> &path, vector<ivec> &edges) {
+void AStar::decision_space(vector<ivec> &path) {
   path.clear();
-  edges.clear();
-  int len = size(map, 1);
 
-  for (int i = 0; i < len; i++) {
-    for (int j = 0; j < len; j++) {
-      if (tree.queued(i, j) == 1) {
-        if (tree.visited(i, j) == 1) {
-          path.push_back({j, i});
-        } else {
-          edges.push_back({j, i});
-        }
+  for (int i = 0; i < map.n_rows; i++) {
+    for (int j = 0; j < map.n_cols; j++) {
+      if (tree.visited(i, j) == 1) {
+        path.push_back({j, i});
       }
     }
   }
 }
 
-/** Grab the final path of nodes and edges from the search space
+/** Grab the final path of nodes from the search space
  *  to the goal
  *  @param path a vector of (x, y) tuples
- *  @param edges a vector of (edgeindex1, edgeindex2) tuples, where
- *         each edgeindex is an index of path
  */
-void ForwardAStar::final_decision(vector<ivec> &path, vector<ivec> &edges) {
+void AStar::final_decision(vector<ivec> &path) {
   path.clear();
-  edges.clear();
   state * step = fin;
   int i = 0;
   path.push_back({step->x, step->y});
   step = step->parent;
 
   while(step != NULL) {
-    edges.push_back({i, i + 1});
     path.push_back({step->x, step->y});
     step = step->parent;
   }	
 }
 
+/** Return whether or not the goal is impossible to reach
+ *  @return true if it is impossible, false otherwise
+ */
+bool AStar::impossible(void) {
+  return !isComplete && tree.pqueue.isEmpty();
+}
 
 /** Return whether or not the goal has been reached
  *  @return true if goal is reached, false otherwise
  */
-bool ForwardAStar::complete(void) {
+bool AStar::complete(void) {
   return isComplete;
 }
-
 
 #if TESTING
 
 int main() {
 
   return 0;
-
 }
 
 #endif

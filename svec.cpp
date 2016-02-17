@@ -4,9 +4,11 @@
 svec::svec(int initsize) :
   _size(0),
   max_size(0),
-  data(nullptr) {
-  if (_size > 0) {
-    data = new state *[_size];
+  data(NULL) {
+  if (initsize > 0) {
+    _size = initsize;
+    max_size = initsize * 2;
+    data = new state *[max_size];
   }
 }
 
@@ -37,7 +39,7 @@ bool svec::empty(void) {
 void svec::clear(void) {
   if (data) {
     delete data;
-    data = nullptr;
+    data = NULL;
   }
   _size = 0;
   max_size = 0;

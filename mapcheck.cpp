@@ -20,6 +20,9 @@ bool isValidMap(imat map, int x1, int y1, int x2, int y2) {
   assert(0 <= x2 && x2 < (int)map.n_cols);				// Check if x2 is within the maze
   assert(0 <= y2 && y2 < (int)map.n_rows);				// Check if y2 is within the maze
   // flood the thingy with bfs
+  if (map(y1, x1) == 1 || map(y2, x2) == 1) {
+    return false;
+  }
 
 														// Declaring a vector of integers vectors to store the location of the nodes,
   vector<ivec> fringe;									// 		where the (x,y) coordinates of the nodes is an integer vector

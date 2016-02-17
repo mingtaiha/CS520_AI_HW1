@@ -5,15 +5,16 @@
 #include <armadillo>
 #include "searchtree.h"
 
-class ForwardAStar {
+class AStar {
   public:
-    ForwardAStar(arma::imat map, arma::ivec &start, arma::ivec &goal);
-    ~ForwardAStar(void);
+    AStar(arma::imat map, arma::ivec &start, arma::ivec &goal,
+        int forward_mode = true, int heuristic_mode = H_REPEATED);
+    ~AStar(void);
     void compute(void);
-	state * AStar(state * root, searchtree tree);
-    void decision_space(std::vector<arma::ivec> &path, std::vector<arma::ivec> &edges);
-    void final_decision(std::vector<arma::ivec> &path, std::vector<arma::ivec> &edges);
+    void decision_space(std::vector<arma::ivec> &path);
+    void final_decision(std::vector<arma::ivec> &path);
     bool complete(void);
+    bool impossible(void);
 
     arma::imat map;
     arma::ivec start;
@@ -21,8 +22,11 @@ class ForwardAStar {
 
     // stuff for the decision making capability
     searchtree tree;
-	state * fin;
-	bool isComplete;
+	  state * fin;
+	  bool isComplete;
+
+    // flags
+    int heuristic_mode;
 };
 
 #endif
