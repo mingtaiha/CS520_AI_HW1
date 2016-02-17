@@ -69,7 +69,7 @@ void AStar::compute(void) {
     int gx;
     int gy;
     bool operator()(state *a, state *b) {
-      return a->g_value > b->g_value; // get the min value
+      return a->g_value < b->g_value; // get the min value
     }
   } compareStates;
   compareStates.gx = goal(0);
