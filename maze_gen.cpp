@@ -33,7 +33,7 @@ imat maze_gen(int size, int block_prob) {
 }
 
 
-bool maze_save(imat maze, int i = 0) {
+bool maze_save(imat maze, int i) {
 
 	char maze_name[256];
 	string name;
