@@ -47,9 +47,19 @@ void run_map(imat map) {
   drawGrid(pathmap, map);
   blitRGB(screen, pathmap);
   sim_window::update();
+  SDL_Delay(t_delay);
+  drawGrid(pathmap, map);
+  blitRGB(screen, pathmap);
+  sim_window::update();
+  SDL_Delay(t_delay);
 
+  printf("waiting for point 1\n");
   ivec A = getClickedPoint();
-  ivec B = getClickedPoint();
+  printf("waiting for point 2\n");
+  ivec B;
+  do {
+    B = getClickedPoint();
+  } while (B(0) == A(0) && B(1) == A(1));
   AStar astar(map, A, B, true, H_REPEATED);
   int i_blip = 0;
   while (!astar.complete() && !astar.impossible()) {
@@ -95,6 +105,7 @@ int main(int argc, char *argv[]) {
   srand(getpid());
   string mazename = string(argv[1]);
   imat maze = maze_gen(SIZE, block_prob);
+  cout << accu(maze) << endl;
   maps.push_back(maze);
   //int size = SIZE;
   /*for (int i = 0; i < 1; i++) {
