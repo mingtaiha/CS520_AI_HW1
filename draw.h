@@ -14,5 +14,6 @@ int gridy(int y);
 void blitRGB(SDL_Surface *screen, arma::icube &image);
 void drawGrid(arma::icube &grid, arma::imat &map);
 void drawPath(arma::icube &grid, std::vector<arma::ivec> &path);
+void drawBot(arma::icube &grid, int x, int y);
 
 #endif

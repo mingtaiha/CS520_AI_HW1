@@ -26,7 +26,7 @@ void state::setG(int start_x, int start_y) {
 }
 
 void state::setH(int goal_x, int goal_y, int start_x, int start_y) {
-  if (hmode == H_REPEATED) {
+  if (hmode == 0) { // TODO clean this
   	h_value = mdist(this->x, this->y, goal_x, goal_y);
   } else {
     h_value = mdist(start_x, start_y, goal_x, goal_y) -

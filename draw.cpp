@@ -60,8 +60,12 @@ void drawGrid(icube &grid, imat &map) {
   } else {
     grid.zeros();
   }
+  // white fill
+  grid.ones();
+  grid *= 255;
+  icube greensquare = zeros<icube>(blocksize, blocksize, 3);
+  greensquare.slice(1) = ones<imat>(blocksize, blocksize) * 164;
   icube whitesquare = ones<icube>(blocksize, blocksize, 3) * 255;
-  icube graysquare = ones<icube>(blocksize, blocksize, 3) * 64;
   for (int i = 0; i < (int)map.n_rows; i++) {
     for (int j = 0; j < (int)map.n_cols; j++) {
       int startrow = linethickness * 2 + i * (blocksize + linethickness);
@@ -69,7 +73,7 @@ void drawGrid(icube &grid, imat &map) {
       int startcol = linethickness * 2 + j * (blocksize + linethickness);
       int endcol = linethickness + (j + 1) * (blocksize + linethickness);
       if (map(i, j)) {
-        grid(span(startrow, endrow-1), span(startcol, endcol-1), span::all) = graysquare;
+        grid(span(startrow, endrow-1), span(startcol, endcol-1), span::all) = greensquare;
       } else {
         grid(span(startrow, endrow-1), span(startcol, endcol-1), span::all) = whitesquare;
       }
@@ -79,8 +83,9 @@ void drawGrid(icube &grid, imat &map) {
 
 void drawPath(icube &grid, vector<ivec> &path) {
   // start drawing the path
-  icube redsquare = zeros<icube>(blocksize, blocksize, 3);
-  redsquare.slice(0) = ones<imat>(blocksize, blocksize) * 255;
+  icube cyansquare = zeros<icube>(blocksize, blocksize, 3);
+  cyansquare.slice(1) = ones<imat>(blocksize, blocksize) * 255;
+  cyansquare.slice(2) = ones<imat>(blocksize, blocksize) * 255;
   for (ivec &node : path) {
     int x = node(0);
     int y = node(1);
@@ -88,6 +93,16 @@ void drawPath(icube &grid, vector<ivec> &path) {
     int endrow = linethickness + (y + 1) * (blocksize + linethickness);
     int startcol = linethickness * 2 + x * (blocksize + linethickness);
     int endcol = linethickness + (x + 1) * (blocksize + linethickness);
-    grid(span(startrow, endrow-1), span(startcol, endcol-1), span::all) = redsquare;
+    grid(span(startrow, endrow-1), span(startcol, endcol-1), span::all) = cyansquare;
   }
+}
+
+void drawBot(icube &grid, int x, int y) {
+  icube redsquare = zeros<icube>(blocksize, blocksize, 3);
+  redsquare.slice(0) = ones<imat>(blocksize, blocksize) * 255;
+  int startrow = linethickness * 2 + y * (blocksize + linethickness);
+  int endrow = linethickness + (y + 1) * (blocksize + linethickness);
+  int startcol = linethickness * 2 + x * (blocksize + linethickness);
+  int endcol = linethickness + (x + 1) * (blocksize + linethickness);
+  grid(span(startrow, endrow-1), span(startcol, endcol-1), span::all) = redsquare;
 }

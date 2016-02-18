@@ -21,7 +21,7 @@ using namespace std;
  */
 AStar::AStar(imat map, ivec &start, ivec &goal, int forward_mode, int heuristic_mode, int tie_mode) {
   isComplete = 0;
-  if (forward_mode) {
+  if (forward_mode == F_FORWARD) {
     this->start = start;
     this->goal = goal;
   } else {
@@ -109,7 +109,6 @@ void AStar::compute(void) {
  */
 void AStar::decision_space(vector<ivec> &path) {
   path.clear();
-
   for (int i = 0; i < map.n_rows; i++) {
     for (int j = 0; j < map.n_cols; j++) {
       if (tree.closed(i, j) == 1) {
@@ -125,14 +124,8 @@ void AStar::decision_space(vector<ivec> &path) {
  */
 void AStar::final_decision(vector<ivec> &path) {
   path.clear();
-  state * step = fin;
-  int i = 0;
-  path.push_back({step->x, step->y});
-  step = step->parent;
-
-  while(step != NULL) {
-    path.push_back({step->x, step->y});
-    step = step->parent;
+  for (state * step = fin; step != NULL; step = step->parent) {
+    path.push_back({ step->x, step->y });
   }	
 }
 

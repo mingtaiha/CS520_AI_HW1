@@ -114,9 +114,11 @@ searchtree::~searchtree() {
   }
   pqueue.queue.clear();
   // delete all closed nodes
-  root->clear();
-  delete root;
-  root = NULL;
+  if (root) {
+    root->clear();
+    delete root;
+    root = NULL;
+  }
 }
 
 void searchtree::addChildren(state * cur, int hmode) {

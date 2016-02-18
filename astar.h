@@ -9,13 +9,15 @@
 #define G_MAX 1
 #define F_FORWARD 0
 #define F_BACKWARD 1
+#define H_REPEATED 0
+#define H_ADAPTIVE 1
 
 class AStar {
   public:
     AStar(arma::imat map, arma::ivec &start, arma::ivec &goal,
-        int forward_mode = true,
+        int forward_mode = F_FORWARD,
         int heuristic_mode = H_REPEATED,
-        int tie_mode = G_MIN);
+        int tie_mode = G_MAX);
     ~AStar(void);
     void compute(void);
     void decision_space(std::vector<arma::ivec> &path);

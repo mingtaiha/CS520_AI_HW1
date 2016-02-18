@@ -38,7 +38,7 @@ bool svec::empty(void) {
 
 void svec::clear(void) {
   if (data) {
-    delete data;
+    delete[] data;
     data = NULL;
   }
   _size = 0;
@@ -57,7 +57,7 @@ void svec::push_back(state *v) {
     state **newdat = new state *[max_size];
     if (old_size > 0) {
       memcpy(newdat, data, sizeof(state *) * old_size);
-      delete data;
+      delete[] data;
     }
     data = newdat;
   }
