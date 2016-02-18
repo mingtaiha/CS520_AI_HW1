@@ -61,7 +61,7 @@ void drawGrid(icube &grid, imat &map) {
     grid.zeros();
   }
   icube whitesquare = ones<icube>(blocksize, blocksize, 3) * 255;
-  icube graysquare = ones<icube>(blocksize, blocksize, 3) * 128;
+  icube graysquare = ones<icube>(blocksize, blocksize, 3) * 64;
   for (int i = 0; i < (int)map.n_rows; i++) {
     for (int j = 0; j < (int)map.n_cols; j++) {
       int startrow = linethickness * 2 + i * (blocksize + linethickness);

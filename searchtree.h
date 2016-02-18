@@ -36,13 +36,12 @@ class searchtree {
 		searchtree(int start_x, int start_y, int goal_x, int goal_y, imat &map, int hmode);
 		void init(int start_x, int start_y, int goal_x, int goal_y, imat &map, int hmode);
 		~searchtree();
-		void addChildren(state * cur, heap_n &pqueue, imat &visited, imat &queued, imat &map,
-							int start_x, int start_y, int goal_x, int goal_y, int hmode);
-		void addToTree(state * node, imat &visited);
+		void addChildren(state * cur, int hmode);
+		void addToTree(state * node);
 
 		imat map;
-		imat visited;
-		imat queued;
+		imat opened;
+		imat closed;
 		int start_x;
 		int start_y;
 		int goal_x;

@@ -19,11 +19,8 @@ using namespace std;
  *  @param start This is the starting position of the robot
  *  @param goal This is the goal of the robot
  */
-AStar::AStar(imat map, ivec &start, ivec &goal, int forward_mode, int heuristic_mode) {
+AStar::AStar(imat map, ivec &start, ivec &goal, int forward_mode, int heuristic_mode, int tie_mode) {
   isComplete = 0;
-  tree.init(start(0), start(1), goal(0), goal(1), map, heuristic_mode);
-  tree.queued(start(1), start(0)) = 1;
-  tree.visited(start(1), start(0)) = 0;
   if (forward_mode) {
     this->start = start;
     this->goal = goal;
@@ -31,8 +28,11 @@ AStar::AStar(imat map, ivec &start, ivec &goal, int forward_mode, int heuristic_
     this->start = goal;
     this->goal = start;
   }
+  tree.init(this->start(0), this->start(1), this->goal(0), this->goal(1), map, heuristic_mode);
   this->map = map;
+  this->forward_mode = forward_mode;
   this->heuristic_mode = heuristic_mode;
+  this->tie_mode = tie_mode;
 }
 
 AStar::~AStar(void) {
@@ -49,7 +49,7 @@ void AStar::compute(void) {
   svec breaktie;
 
   // STEP 1: Grab a list of minimum positions from the priority queue
-  if (isComplete) {
+  if (isComplete) { // already done, don't do any more
     return;
   }
   state * s = tree.pqueue.remove();
@@ -63,18 +63,24 @@ void AStar::compute(void) {
     breaktie.push_back(s);
   }
 
-  // STEP 2: Use random tie breaking to choose a position from the queue,
+  // STEP 2: Use g_value tie breaking to choose a position from the queue,
   //         and place the rest back into the queue
   struct {
-    int gx;
-    int gy;
     bool operator()(state *a, state *b) {
       return a->g_value < b->g_value; // get the min value
     }
-  } compareStates;
-  compareStates.gx = goal(0);
-  compareStates.gy = goal(1);
-  sort(breaktie.begin(), breaktie.end(), compareStates);
+  } gMin;
+  struct {
+    bool operator()(state *a, state *b) {
+      return a->g_value > b->g_value; // get the max value
+    }
+  } gMax;
+  // resolve the tie
+  if (this->tie_mode == G_MIN) {
+    sort(breaktie.begin(), breaktie.end(), gMin);
+  } else {
+    sort(breaktie.begin(), breaktie.end(), gMax);
+  }
   choice = breaktie[0];
   for (int i = 1; i < breaktie.size(); i++) {
     tree.pqueue.insert(breaktie[i]);
@@ -85,15 +91,15 @@ void AStar::compute(void) {
   //         if it is, RETURN (do not do anything)
 
   if (choice->x == tree.goal_x && choice->y == tree.goal_y) {
+    tree.addToTree(choice);
     isComplete = 1;
     fin = choice;
   } else {
     // STEP 4: Compute the cost of the 4-connected neighborhood and
     //         add them to the priority queue if they have not been
     //         added before
-    tree.addToTree(choice, tree.visited);
-    tree.addChildren(choice, tree.pqueue, tree.visited, tree.queued, tree.map,
-        tree.start_x, tree.start_y, tree.goal_x, tree.goal_y, heuristic_mode);
+    tree.addToTree(choice);
+    tree.addChildren(choice, heuristic_mode);
     isComplete = 0;
   }	
 }
@@ -101,13 +107,12 @@ void AStar::compute(void) {
 /** Grab the entire tree of nodes from the search space
  *  @param path a vector of (x, y) tuples
  */
-
 void AStar::decision_space(vector<ivec> &path) {
   path.clear();
 
   for (int i = 0; i < map.n_rows; i++) {
     for (int j = 0; j < map.n_cols; j++) {
-      if (tree.visited(i, j) == 1) {
+      if (tree.closed(i, j) == 1) {
         path.push_back({j, i});
       }
     }

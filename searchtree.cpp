@@ -96,26 +96,30 @@ void searchtree::init(int start_x, int start_y, int goal_x, int goal_y, imat &ma
   this->start_y = start_y;
   this->goal_x = goal_x;
   this->goal_y = goal_y;
-  visited = zeros<imat>(map.n_rows, map.n_cols);
-  queued = zeros<imat>(map.n_rows, map.n_cols);
+  opened = zeros<imat>(map.n_rows, map.n_cols);
+  closed = zeros<imat>(map.n_rows, map.n_cols);
   // initially set root to NULL
   root = NULL;
   state * temp = new state(start_x, start_y, NULL, map, hmode);
   temp->setG(start_x, start_y);
   temp->setH(goal_x, goal_y, start_x, start_y);
   pqueue.insert(temp);
+  this->opened(start_y, start_x) = 1;
 }
 
 searchtree::~searchtree() {
+  // delete all open nodes
   for (state * s : pqueue.queue) {
     delete s;
   }
+  pqueue.queue.clear();
+  // delete all closed nodes
   root->clear();
   delete root;
+  root = NULL;
 }
 
-void searchtree::addChildren(state * cur, heap_n &pqueue, imat &visited, imat &queued, imat &map,
-    int start_x, int start_y, int goal_x, int goal_y, int hmode) {
+void searchtree::addChildren(state * cur, int hmode) {
 
   state * temp;
   int x_s = cur->x;
@@ -134,8 +138,8 @@ void searchtree::addChildren(state * cur, heap_n &pqueue, imat &visited, imat &q
     if (map(y_t(i), x_t(i)) == 1) {
       continue;
     }
-    // check if queued already
-    if (queued(y_t(i), x_t(i)) == 1) {
+    // check if opened already
+    if (opened(y_t(i), x_t(i)) == 1) {
       continue;
     }
     // create a new node with cur as the parent
@@ -144,7 +148,7 @@ void searchtree::addChildren(state * cur, heap_n &pqueue, imat &visited, imat &q
     temp->setH(goal_x, goal_y, start_x, start_y);
     // add to queue
     pqueue.insert(temp);
-    queued(y_t(i), x_t(i)) = 1;
+    opened(y_t(i), x_t(i)) = 1;
   }
 }
 
@@ -152,8 +156,8 @@ int childid(int x1, int y1, int x2, int y2) {
   return (((y2 - y1) > 0) << 1) | ((x2 - x1) > 0);
 }
 
-void searchtree::addToTree(state * node, imat &visited) {
-  visited(node->y, node->x) = 1;
+void searchtree::addToTree(state * node) {
+  closed(node->y, node->x) = 1;
   if (node->parent == NULL) {
     this->root = node;
   } else {
