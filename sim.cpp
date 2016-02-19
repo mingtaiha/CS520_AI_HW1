@@ -60,7 +60,7 @@ void run_map(imat map) {
   drawGrid(pathmap, map);
   blitRGB(screen, pathmap);
   sim_window::update();
-  SDL_Delay(t_delay);
+  SDL_Delay(t_delay * 5);
 
   // grab the start and goal positions
   bool isSame = 1;
@@ -131,14 +131,15 @@ void run_map(imat map) {
 }
 
 int main(int argc, char *argv[]) {
-  signal(SIGALRM, stopprog);
-  alarm(120);
+  //signal(SIGALRM, stopprog);
+  //alarm(120);
+  srand(getpid());
   // TODO: create argument labels for generating maps and using static maps, as well as options for the simulation
   imat maze;
   int block_prob;
 
   if (argc < 3) {
-    printf("usage: %s [random=<block_prob>|file=<filename>] [forward_max|forward_min|backward|adaptive]\n", argv[0]);
+    printf("usage: %s [random=<0..100>|file=<filename>] [forward_max|forward_min|backward|adaptive]\n", argv[0]);
     return 1;
   } else {
     string arg1 = argv[1];
@@ -155,6 +156,10 @@ int main(int argc, char *argv[]) {
     } else if (arg1.substr(0, pos).compare("random") == 0) {
       RANDOM = 1;
       block_prob = atoi(arg1.substr(pos+1, arg1.size()-pos-1).c_str());
+      if (block_prob < 0 || block_prob > 100) {
+        printf("error: probability must be between 0 to 100\n");
+        return 1;
+      }
       maze = maze_gen(MAZESIZE, block_prob);
     } else {
       printf("error: format is [random=<block_prob>|file=<filename>]\n");
