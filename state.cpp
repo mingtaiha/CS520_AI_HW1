@@ -5,16 +5,19 @@
 using namespace std;
 using namespace arma;
 
-state::state(int x, int y, state * parent, imat &map, int heuristic_mode) {
+static imat gd_value;
+static imat interim;
+static int adaptive;
+
+state::state(int x, int y, state * parent, imat &map) {
 	this->x = x;
 	this->y = y;
 	g_value = -1;
 	h_value = -1;
-  f = g_value + h_value;
+  f_value = g_value + h_value;
 	this->parent = parent;
   this->map = map;
   memset(&this->children, 0, sizeof(state *) * 4); // reset the children
-  hmode = heuristic_mode;
 }
 
 state::~state() {
@@ -22,41 +25,41 @@ state::~state() {
 
 void state::setG(int start_x, int start_y) {
 	g_value = (this->parent == NULL) ? 0 : this->parent->g_value + 1;
-  f = g_value + h_value;
+  interim(y,x) = g_value;
+  f_value = g_value + h_value;
 }
 
 void state::setH(int goal_x, int goal_y, int start_x, int start_y) {
-  if (hmode == 0) { // TODO clean this
-  	h_value = mdist(this->x, this->y, goal_x, goal_y);
-  } else {
-    h_value = mdist(start_x, start_y, goal_x, goal_y) -
-      ((this->parent == NULL) ? 0 : this->parent->g_value + 1);
+  if (adaptive == H_REPEATED) {
+   	h_value = mdist(this->x, this->y, goal_x, goal_y);
+  } else if (adaptive == H_ADAPTIVE) {
+    h_value = gd_value(y, x);
   }
-  f = g_value + h_value;
+  f_value = g_value + h_value;
 }
 
 bool state::operator<(const state &other) {
-	return this->f < other.f;
+	return this->f_value < other.f_value;
 }
 
 bool state::operator>(const state &other) {
-	return this->f > other.f;
+	return this->f_value > other.f_value;
 }
 
 bool state::operator<=(const state &other) {
-	return this->f <= other.f;
+	return this->f_value <= other.f_value;
 }
 
 bool state::operator>=(const state &other) {
-	return this->f >= other.f;
+	return this->f_value >= other.f_value;
 }
 
 bool state::operator==(const state &other) {
-	return this->f == other.f;
+	return this->f_value == other.f_value;
 }
 
 bool state::operator!=(const state &other) {
-	return this->f != other.f;
+	return this->f_value != other.f_value;
 }
 
 void state::clear(void) {
@@ -66,6 +69,20 @@ void state::clear(void) {
       delete this->children[i];
     }
   }
+}
+
+void set_cost(imat gd_default) {
+  gd_value = gd_default;
+  interim = ones<imat>(gd_value.n_rows, gd_value.n_cols) * -1;
+}
+void set_adaptive(int heuristic_mode) { // hack
+  adaptive = heuristic_mode;
+}
+imat get_cost(void) {
+  return gd_value;
+}
+imat get_interim(void) {
+  return interim;
 }
 
 ostream &operator<<(ostream &out, state &st) {

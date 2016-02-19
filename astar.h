@@ -9,8 +9,6 @@
 #define G_MAX 1
 #define F_FORWARD 0
 #define F_BACKWARD 1
-#define H_REPEATED 0
-#define H_ADAPTIVE 1
 
 class AStar {
   public:

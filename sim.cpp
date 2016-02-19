@@ -10,9 +10,9 @@
 #include "maze_imgio.h"
 #include "robot.h"
 
-#define SIZE 25
-#define block_prob 20
-#define t_delay 25
+#define SIZE 101
+#define block_prob 0
+#define t_delay 500
 using namespace std;
 using namespace arma;
 
@@ -75,7 +75,7 @@ void run_map(imat map) {
     }
   }
   Robot robot(start);
-  robot.search(map, start, goal, F_FORWARD, H_REPEATED, G_MAX);
+  robot.search(map, start, goal, F_FORWARD, H_ADAPTIVE, G_MAX);
   int i_blip = 0;
   while (!robot.complete() && !robot.stuck()) {
     // search the space to find a path
@@ -87,9 +87,9 @@ void run_map(imat map) {
           exit(1);
         }
       }
-      robot.searchalgo->compute();
+      robot.run();
       robot.searchalgo->decision_space(path);
-      if (i_blip % 100 == 0) {
+      if (i_blip % 1 == 0) {
         drawGrid(pathmap, map);
         drawPath(pathmap, path);
         drawBot(pathmap, robot.x, robot.y);
@@ -114,7 +114,7 @@ void run_map(imat map) {
 
     // move the robot to the new position
     if (path.size() >= 2) {
-      robot.move(path[path.size() - 2]);
+      robot.move(robot.getMotion());
     }
   }
   drawGrid(pathmap, map);
@@ -137,8 +137,8 @@ int main(int argc, char *argv[]) {
   //srand(getpid());
   //  string mazename = string(argv[1]);
   //imat maze = maze_gen(SIZE, block_prob);
-  string mazename = string("maze.png");
-  imat maze = load_maze(mazename);
+  string mazename = string("maze2.png");
+  imat maze = flipud(load_maze(mazename));
   //maps.push_back(maze);
   //int size = SIZE;
   /*for (int i = 0; i < 1; i++) {
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 
   // after the maps are created, start the a_star algorithm
   //setLineThickness(0);
-  setBlockSize(3);
+  setBlockSize(30);
   screen = sim_window::init(getGridWidth(maze.n_cols), getGridHeight(maze.n_rows));
   //for (imat &map : maps) {
     run_map(maze);

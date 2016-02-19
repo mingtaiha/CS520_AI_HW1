@@ -86,11 +86,11 @@ bool heap_n::isEmpty() {
 searchtree::searchtree() {
 }
 
-searchtree::searchtree(int sx, int sy, int gx, int gy, imat &map, int hmode) {
-  init(sx, sy, gx, gy, map, hmode);
+searchtree::searchtree(int sx, int sy, int gx, int gy, imat &map) {
+  init(sx, sy, gx, gy, map);
 }
 
-void searchtree::init(int start_x, int start_y, int goal_x, int goal_y, imat &map, int hmode) {
+void searchtree::init(int start_x, int start_y, int goal_x, int goal_y, imat &map) {
   this->map = map;
   this->start_x = start_x;
   this->start_y = start_y;
@@ -100,7 +100,7 @@ void searchtree::init(int start_x, int start_y, int goal_x, int goal_y, imat &ma
   closed = zeros<imat>(map.n_rows, map.n_cols);
   // initially set root to NULL
   root = NULL;
-  state * temp = new state(start_x, start_y, NULL, map, hmode);
+  state * temp = new state(start_x, start_y, NULL, map);
   temp->setG(start_x, start_y);
   temp->setH(goal_x, goal_y, start_x, start_y);
   pqueue.insert(temp);
@@ -121,7 +121,7 @@ searchtree::~searchtree() {
   }
 }
 
-void searchtree::addChildren(state * cur, int hmode) {
+void searchtree::addChildren(state * cur) {
 
   state * temp;
   int x_s = cur->x;
@@ -145,7 +145,7 @@ void searchtree::addChildren(state * cur, int hmode) {
       continue;
     }
     // create a new node with cur as the parent
-    temp = new state(x_t(i), y_t(i), cur, map, hmode);
+    temp = new state(x_t(i), y_t(i), cur, map);
     temp->setG(start_x, start_y);
     temp->setH(goal_x, goal_y, start_x, start_y);
     // add to queue
@@ -170,9 +170,7 @@ void searchtree::addToTree(state * node) {
 
 /// ------------ TESTING -------------- ///
 
-
 #if TESTING
-
 
 int main() {
   return 0;

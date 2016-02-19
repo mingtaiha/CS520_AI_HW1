@@ -4,6 +4,9 @@
 #include <iostream>
 #include <armadillo>
 
+#define H_REPEATED 0
+#define H_ADAPTIVE 1
+
 class state {
 
 	public:
@@ -15,14 +18,13 @@ class state {
 		double g_value;					// Cost of getting to the current state
 		double h_value;					// Estimated cost of getting to the goal
 										//		from the current state
+    double f_value; // f_value
     arma::imat map;
-    int hmode;
 
-		state(int x, int y, state * parent, arma::imat &map, int hmode = 0);
+		state(int x, int y, state * parent, arma::imat &map);
 		~state();
 		void setG(int start_x, int start_y);
 		void setH(int goal_x, int goal_y, int start_x = 0, int start_y = 0);
-    double f; // f_value
 		bool operator<(const state &other);
 		bool operator>(const state &other);
 		bool operator<=(const state &other);
@@ -33,5 +35,9 @@ class state {
 };
 
 std::ostream &operator<<(std::ostream &out, state &cur_state);
+void set_cost(arma::imat cost_matrix);
+void set_adaptive(int heuristic_mode);
+arma::imat get_cost(void);
+arma::imat get_interim(void);
 
 #endif

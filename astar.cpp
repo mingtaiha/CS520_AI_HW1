@@ -20,15 +20,11 @@ using namespace std;
  *  @param goal This is the goal of the robot
  */
 AStar::AStar(imat map, ivec &start, ivec &goal, int forward_mode, int heuristic_mode, int tie_mode) {
+  this->fin = NULL;
   isComplete = 0;
-  if (forward_mode == F_FORWARD) {
-    this->start = start;
-    this->goal = goal;
-  } else {
-    this->start = goal;
-    this->goal = start;
-  }
-  tree.init(this->start(0), this->start(1), this->goal(0), this->goal(1), map, heuristic_mode);
+  this->start = start;
+  this->goal = goal;
+  tree.init(this->start(0), this->start(1), this->goal(0), this->goal(1), map);
   this->map = map;
   this->forward_mode = forward_mode;
   this->heuristic_mode = heuristic_mode;
@@ -99,7 +95,7 @@ void AStar::compute(void) {
     //         add them to the priority queue if they have not been
     //         added before
     tree.addToTree(choice);
-    tree.addChildren(choice, heuristic_mode);
+    tree.addChildren(choice);
     isComplete = 0;
   }	
 }

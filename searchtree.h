@@ -33,10 +33,10 @@ class searchtree {
 	public:
 		
 		searchtree();
-		searchtree(int start_x, int start_y, int goal_x, int goal_y, imat &map, int hmode);
-		void init(int start_x, int start_y, int goal_x, int goal_y, imat &map, int hmode);
+		searchtree(int start_x, int start_y, int goal_x, int goal_y, imat &map);
+		void init(int start_x, int start_y, int goal_x, int goal_y, imat &map);
 		~searchtree();
-		void addChildren(state * cur, int hmode);
+		void addChildren(state * cur);
 		void addToTree(state * node);
 
 		imat map;

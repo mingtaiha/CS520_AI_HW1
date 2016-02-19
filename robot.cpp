@@ -15,25 +15,41 @@ Robot::~Robot(void) {
   }
 }
 
-void Robot::search(arma::imat map, arma::ivec &start, arma::ivec &goal,
+static imat map_mdist(int n_rows, int n_cols, ivec start, ivec goal) {
+  imat mm(n_rows, n_cols);
+  for (int i = 0; i < n_rows; i++) {
+    for (int j = 0; j < n_cols; j++) {
+      mm(i, j) = mdist(j, i, goal(0), goal(1));
+    }
+  }
+  return mm;
+}
+
+void Robot::search(imat map, ivec &start, ivec &goal,
     int forward_mode, int heuristic_mode, int tie_mode) {
-  this->searchalgo = new AStar(map, start, goal, forward_mode, heuristic_mode, tie_mode);
+  this->goal = goal;
+  this->forward_mode = forward_mode;
+  set_cost(map_mdist(map.n_rows, map.n_cols, start, goal));
+  if (forward_mode == F_FORWARD) {
+    this->searchalgo = new AStar(map, start, goal, F_FORWARD, heuristic_mode, tie_mode);
+  } else {
+    this->searchalgo = new AStar(map, goal, start, F_FORWARD, heuristic_mode, tie_mode);
+  }
+  set_adaptive(heuristic_mode);
 }
 
 void Robot::run(void) {
-  while (!searchalgo->complete() && !searchalgo->impossible()) {
+  if (!searchalgo->complete() && !searchalgo->impossible()) {
     searchalgo->compute();
   }
-  vector<ivec> path;
-  searchalgo->final_decision(path); // backtrack
 }
 
 bool Robot::complete(void) {
   if (!this->searchalgo) {
     return true;
   }
-  return this->x == this->searchalgo->goal(0) &&
-         this->y == this->searchalgo->goal(1);
+  return this->x == this->goal(0) &&
+    this->y == this->goal(1);
 }
 
 bool Robot::stuck(void) {
@@ -43,20 +59,43 @@ bool Robot::stuck(void) {
   return this->searchalgo->impossible();
 }
 
+ivec Robot::getMotion(void) {
+  vector<ivec> path;
+  this->searchalgo->final_decision(path);
+  if (this->forward_mode == F_FORWARD) {
+    return path[path.size()-2];
+  } else {
+    return path[1];
+  }
+}
+
+imat mod_cost(imat cost, imat interim, ivec goal) {
+  int goalcost = cost(goal(1), goal(0));
+  for (int i = 0; i < (int)cost.n_rows; i++) {
+    for (int j = 0; j < (int)cost.n_cols; j++) {
+      if (interim(i, j) != -1) {
+        cost(i, j) = goalcost - interim(i, j);
+      }
+    }
+  }
+  return cost;
+}
+
 void Robot::move(ivec newpos) {
   this->x = newpos(0);
   this->y = newpos(1);
   if (this->searchalgo) {
-    this->searchalgo->tree.pqueue.queue.clear();
-    this->searchalgo->opened.zeros();
-    this->searchalgo->closed.zeros();
-    /*imat map = this->searchalgo->map;
+    imat map = this->searchalgo->map;
     ivec start({ this->x, this->y });
-    ivec goal = this->searchalgo->goal;
-    int forward_mode = this->searchalgo->forward_mode;
     int heuristic_mode = this->searchalgo->heuristic_mode;
     int tie_mode = this->searchalgo->tie_mode;
     delete this->searchalgo;
-    this->searchalgo = new AStar(map, start, goal, forward_mode, heuristic_mode, tie_mode);*/
+    // switch up backward and forward
+    if (this->forward_mode == F_FORWARD) {
+      this->searchalgo = new AStar(map, start, this->goal, this->forward_mode, heuristic_mode, tie_mode);
+    } else {
+      this->searchalgo = new AStar(map, this->goal, start, this->forward_mode, heuristic_mode, tie_mode);
+    }
   }
+  set_cost(mod_cost(get_cost(), get_interim(), this->goal));
 }

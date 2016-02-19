@@ -13,10 +13,13 @@ class Robot {
     bool complete(void); // upper bound for intelligence
     bool stuck(void); // lower bound for intelligence
     void move(arma::ivec newpos);
+    arma::ivec getMotion(void);
 
     int x;
     int y;
+    arma::ivec goal;
     AStar *searchalgo;
+    bool forward_mode;
 };
 
 #endif
