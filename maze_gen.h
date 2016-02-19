@@ -9,7 +9,7 @@
 
 //Note:: The blocking probability is 100 times the actually probability
 #define MAZESIZE 101
-#define BLOCK_PROB 0
+#define BLOCK_PROB 30
 
 arma::imat maze_gen(int size = MAZESIZE, int block_prob = BLOCK_PROB);
 bool maze_save(arma::imat maze, int i = 0);

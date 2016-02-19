@@ -69,21 +69,48 @@ ivec Robot::getMotion(void) {
   }
 }
 
+
+
 imat mod_cost(imat cost, imat interim, ivec goal) {
-  int goalcost = cost(goal(1), goal(0));
-  for (int i = 0; i < (int)cost.n_rows; i++) {
-    for (int j = 0; j < (int)cost.n_cols; j++) {
-      if (interim(i, j) != -1) {
-        cost(i, j) = goalcost - interim(i, j);
+  vector<ivec> fringe;
+  vector<int> running_cost;
+  fringe.push_back(ivec({ goal(1), goal(0) }));
+  running_cost.push_back(0);
+  umat visited(cost.n_rows, cost.n_cols, fill::zeros);
+  visited(goal(1), goal(0)) = 1;
+  
+  for (int i = 0; i < fringe.size(); i++) {
+    ivec pt = fringe[i];
+    int rcost = running_cost[i];
+    cost(pt(0), pt(1)) = rcost;
+    ivec y = { pt(0) - 1, pt(0), pt(0), pt(0) + 1 };
+    ivec x = { pt(1), pt(1) - 1, pt(1) + 1, pt(1) };
+    for (int j = 0; j < 4; j++) {
+      if (0 <= x(j) && x(j) < (int)cost.n_cols &&
+          0 <= y(j) && y(j) < (int)cost.n_rows &&
+          visited(y(j), x(j)) == 0 &&
+          interim(y(j), x(j)) > -1) {
+        visited(y(j), x(j)) = 1;
+        fringe.push_back(ivec({ y(j), x(j) }));
+        running_cost.push_back(rcost + 1);
       }
     }
   }
+
+  //cout << "\n\n*****************\n";
+  //cout << "Cost:\n";
+  //cout << cost;
+  //cout << "\n\n*****************\n";
+
   return cost;
 }
 
 void Robot::move(ivec newpos) {
   this->x = newpos(0);
   this->y = newpos(1);
+  if (this->x == newpos(0) && this->y == newpos(1)) {
+
+  }
   if (this->searchalgo) {
     imat map = this->searchalgo->map;
     ivec start({ this->x, this->y });
@@ -91,11 +118,11 @@ void Robot::move(ivec newpos) {
     int tie_mode = this->searchalgo->tie_mode;
     delete this->searchalgo;
     // switch up backward and forward
+    set_cost(mod_cost(get_cost(), get_interim(), this->goal));
     if (this->forward_mode == F_FORWARD) {
       this->searchalgo = new AStar(map, start, this->goal, this->forward_mode, heuristic_mode, tie_mode);
     } else {
       this->searchalgo = new AStar(map, this->goal, start, this->forward_mode, heuristic_mode, tie_mode);
     }
   }
-  set_cost(mod_cost(get_cost(), get_interim(), this->goal));
 }

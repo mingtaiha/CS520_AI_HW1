@@ -10,9 +10,7 @@
 #include "maze_imgio.h"
 #include "robot.h"
 
-#define SIZE 101
-#define block_prob 0
-#define t_delay 500
+#define t_delay 25
 using namespace std;
 using namespace arma;
 
@@ -23,6 +21,13 @@ void stopprog(int signo) {
 
 SDL_Surface *screen;
 static bool mouseon;
+
+/// OPTIONS ///
+static int RANDOM = 1;
+static int F = F_FORWARD;
+static int H = H_REPEATED;
+static int G = G_MAX;
+static string fname;
 
 ivec getClickedPoint(void) {
   SDL_Event *e;
@@ -55,6 +60,7 @@ void run_map(imat map) {
   drawGrid(pathmap, map);
   blitRGB(screen, pathmap);
   sim_window::update();
+  SDL_Delay(t_delay);
 
   // grab the start and goal positions
   bool isSame = 1;
@@ -75,7 +81,7 @@ void run_map(imat map) {
     }
   }
   Robot robot(start);
-  robot.search(map, start, goal, F_FORWARD, H_ADAPTIVE, G_MAX);
+  robot.search(map, start, goal, F, H, G);
   int i_blip = 0;
   while (!robot.complete() && !robot.stuck()) {
     // search the space to find a path
@@ -89,7 +95,7 @@ void run_map(imat map) {
       }
       robot.run();
       robot.searchalgo->decision_space(path);
-      if (i_blip % 1 == 0) {
+      if (i_blip % 100 == 0) {
         drawGrid(pathmap, map);
         drawPath(pathmap, path);
         drawBot(pathmap, robot.x, robot.y);
@@ -128,35 +134,59 @@ int main(int argc, char *argv[]) {
   signal(SIGALRM, stopprog);
   alarm(120);
   // TODO: create argument labels for generating maps and using static maps, as well as options for the simulation
-  //  if (argc < 2) {
-  //    printf("input file name\n");
-  //    return 1;
-  //  }
-  // create maps
-  //vector<imat> maps;
-  //srand(getpid());
-  //  string mazename = string(argv[1]);
-  //imat maze = maze_gen(SIZE, block_prob);
-  string mazename = string("maze2.png");
-  imat maze = flipud(load_maze(mazename));
-  //maps.push_back(maze);
-  //int size = SIZE;
-  /*for (int i = 0; i < 1; i++) {
-    imat maze = maze_gen(size, block_prob);
-  //while (!isValidMap(maze, 0, 0, size-1, size-1)) {
-  //maze = maze_gen(size, block_prob);
-  //}
-  maps.push_back(maze);
-  }*/
+  imat maze;
+  int block_prob;
 
-  // after the maps are created, start the a_star algorithm
-  //setLineThickness(0);
-  setBlockSize(30);
+  if (argc < 3) {
+    printf("usage: %s [random=<block_prob>|file=<filename>] [forward_max|forward_min|backward|adaptive]\n", argv[0]);
+    return 1;
+  } else {
+    string arg1 = argv[1];
+    string arg2 = argv[2];
+    size_t pos;
+    if ((pos = arg1.find("=")) == string::npos) {
+      printf("error: format is [random=<block_prob>|file=<filename>]\n");
+      return 1;
+    }
+    if (arg1.substr(0, pos).compare("file") == 0) {
+      RANDOM = 0;
+      fname = arg1.substr(pos+1, arg1.size()-pos-1);
+      maze = load_maze(fname);
+    } else if (arg1.substr(0, pos).compare("random") == 0) {
+      RANDOM = 1;
+      block_prob = atoi(arg1.substr(pos+1, arg1.size()-pos-1).c_str());
+      maze = maze_gen(MAZESIZE, block_prob);
+    } else {
+      printf("error: format is [random=<block_prob>|file=<filename>]\n");
+      return 1;
+    }
+
+    if (arg2.compare("forward_max") == 0) {
+      H = H_REPEATED;
+      F = F_FORWARD;
+      G = G_MAX;
+    } else if (arg2.compare("forward_min") == 0) {
+      H = H_REPEATED;
+      F = F_FORWARD;
+      G = G_MIN;
+    } else if (arg2.compare("backward") == 0) {
+      H = H_REPEATED;
+      F = F_BACKWARD;
+      G = G_MAX;
+    } else if (arg2.compare("adaptive") == 0) {
+      H = H_ADAPTIVE;
+      F = F_FORWARD;
+      G = G_MAX;
+    } else {
+      printf("error: format is [forward_max|forward_min|backward|adaptive]\n");
+      return 1;
+    }
+  }
+  // create maps
+  setBlockSize(5);
   screen = sim_window::init(getGridWidth(maze.n_cols), getGridHeight(maze.n_rows));
-  //for (imat &map : maps) {
-    run_map(maze);
-    sleep(1);
-  //}
+  run_map(maze);
+  sleep(1);
   sim_window::destroy();
 
   return 0;

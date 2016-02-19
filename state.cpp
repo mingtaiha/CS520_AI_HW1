@@ -8,6 +8,7 @@ using namespace arma;
 static imat gd_value;
 static imat interim;
 static int adaptive;
+static bool adaptive_isset;
 
 state::state(int x, int y, state * parent, imat &map) {
 	this->x = x;
@@ -30,10 +31,13 @@ void state::setG(int start_x, int start_y) {
 }
 
 void state::setH(int goal_x, int goal_y, int start_x, int start_y) {
-  if (adaptive == H_REPEATED) {
+  if (adaptive == H_REPEATED || !adaptive_isset) {
    	h_value = mdist(this->x, this->y, goal_x, goal_y);
   } else if (adaptive == H_ADAPTIVE) {
-    h_value = gd_value(y, x);
+    h_value = gd_value(y,x);
+  }
+  if (adaptive == H_ADAPTIVE && !adaptive_isset && h_value == 0) {
+    adaptive_isset = true;
   }
   f_value = g_value + h_value;
 }
@@ -74,6 +78,7 @@ void state::clear(void) {
 void set_cost(imat gd_default) {
   gd_value = gd_default;
   interim = ones<imat>(gd_value.n_rows, gd_value.n_cols) * -1;
+  adaptive_isset = false;
 }
 void set_adaptive(int heuristic_mode) { // hack
   adaptive = heuristic_mode;
