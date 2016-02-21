@@ -1,3 +1,7 @@
+//
+//	[Author] =  Ming Tai Ha
+//
+
 #ifndef maze_gen_h
 #define maze_gen_h
 

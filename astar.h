@@ -1,3 +1,7 @@
+//
+//	[Author] = Ming Tai Ha
+//
+
 #ifndef astar_h
 #define astar_h
 

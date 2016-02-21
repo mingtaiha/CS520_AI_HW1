@@ -1,3 +1,7 @@
+//
+//	[Author] = Ming Tai Ha
+//
+
 #ifndef searchtree_h
 #define searchtree_h
 

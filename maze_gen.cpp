@@ -1,3 +1,7 @@
+//
+//	Author =  Ming Tai Ha
+//
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>

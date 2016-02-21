@@ -1,3 +1,7 @@
+//
+//	[Author] = Ming Tai Ha
+//
+
 #ifndef state_h
 #define state_h
 

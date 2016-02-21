@@ -1,3 +1,7 @@
+//
+//	[Author] = Ming Tai Ha
+//
+
 #include "searchtree.h"
 #include "heuristic.h"
 #include <iostream>

@@ -1,3 +1,7 @@
+//
+//	[Author] = Ming Tai Ha
+//
+
 #ifndef searchstate_h
 #define searchstate_h
 

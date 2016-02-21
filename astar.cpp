@@ -1,3 +1,9 @@
+//
+//	[Author] = Ming Tai Ha
+//
+
+
+
 #include "astar.h"
 #include "searchtree.h"
 #include "maze_gen.h"

@@ -1,3 +1,7 @@
+//
+//	[Author] = Ming Tai Ha
+//
+
 #include "state.h"
 #include <cstring>
 #include "heuristic.h"
